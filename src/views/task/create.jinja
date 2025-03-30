@@ -1,0 +1,19 @@
+{% extends "main" %}
+{% block title %}{{ super() }} | {{ title }} {% endblock %}
+{% block body %}
+<form action="/planning" method="post">
+    <label for="name">
+        Nb de jours :
+        <input type="number" name="nbdays" value="180">
+    </label>
+    <label for="strdat">
+        Date de début
+        <input type="date" name="strdate" value="2025-01-01">
+    </label>
+    <label for="anddat">
+        Date de fin
+        <input type="date" name="enddate" value="2025-12-31">
+    </label>
+    <input type="submit" value="Générer le planning">
+</form>
+{% endblock %}
