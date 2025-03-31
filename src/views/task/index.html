@@ -1,0 +1,10 @@
+{% extends "main" %}
+{% block title %}{{ super() }} | {{ title }} {% endblock %}
+{% block body %}
+    {% for task in tasks %}
+    <ul>
+        <li>{{ task.description }}</li>
+    </ul>
+    {% endfor %}
+</label>
+{% endblock %}

@@ -1,6 +1,8 @@
+mod models;
+mod views;
 mod controllers;
 mod utils;
-mod views;
+
 use axum::{Router, routing::get};
 use minijinja::Environment;
 use std::sync::Arc;
@@ -31,7 +33,7 @@ async fn main() {
     // Ajout des routes
     let app = Router::new()
         .route("/", get(controllers::home::controller_home))
-        .route("/task", get(controllers::task::controller_task))
+        .route("/task", get(controllers::task::index))
         .with_state(app_state);
     let listener = tokio::net::TcpListener::bind(format!("127.0.0.1:{port}"))
         .await
