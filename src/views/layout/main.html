@@ -1,8 +1,12 @@
 <!doctype html>
 <html>
-  <head><title>{% block title %}Todo list{% endblock %}</title></head>
+  <head>
+    <title>{% block title %}Todo list{% endblock %}</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+  </head>
   <body>
     {% include "menu" %}
     {% block body %}{% endblock %}
+    <script src="/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
