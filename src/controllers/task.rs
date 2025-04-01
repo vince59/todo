@@ -8,20 +8,13 @@ use std::sync::Arc;
 
 pub async fn index(State(state): State<Arc<AppState>>) -> Result<Html<String>, StatusCode> {
     let template = state.env.get_template("task.index").unwrap();
-    //let tasks = vec![Task::default();5];
+    
+    let conn = state.db.lock().unwrap();
 
-    let conn = Task::connect().map_err(|err| {
-        println!("Erreur de connexion à SQLite: {:?}", err);
+    let tasks = Task::get_all(&conn).map_err(|err| {
+        eprintln!("Erreur sql: {:?}", err);
         StatusCode::INTERNAL_SERVER_ERROR
-    })?; // Connexion à SQLite
-    let tasks = Task::get_all_tasks(&conn).map_err(|err| {
-        println!("Erreur de connexion à SQLite: {:?}", err);
-        StatusCode::INTERNAL_SERVER_ERROR
-    })?; // Récupérer les enregistrements
-
-    /*  for task in tasks {
-        println!("Description: {}", task.description);
-    }*/
+    })?; 
 
     let rendered = template
         .render(context! {

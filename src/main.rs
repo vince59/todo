@@ -1,24 +1,23 @@
-mod models;
-mod views;
 mod controllers;
+mod models;
 mod utils;
+mod views;
 
-use axum::{Router, routing::get, http::header,response::IntoResponse};
+use std::sync::{Arc, Mutex};
+use axum::{Router, http::header, response::IntoResponse, routing::get};
 use minijinja::Environment;
-use std::sync::Arc;
+use rusqlite::Connection;
 
 const BOOTSTRAP_CSS: &[u8] = include_bytes!("./static/css/bootstrap.min.css");
 const BOOTSTRAP_JS: &[u8] = include_bytes!("./static/js/bootstrap.bundle.min.js");
 
 struct AppState {
     env: Environment<'static>,
+    db: Arc<Mutex<Connection>>,
 }
 
 async fn serve_bootstrap_css() -> impl IntoResponse {
-    (
-        [(header::CONTENT_TYPE, "text/css")],
-        BOOTSTRAP_CSS.to_vec(),
-    )
+    ([(header::CONTENT_TYPE, "text/css")], BOOTSTRAP_CSS.to_vec())
 }
 
 // Fonction pour servir bootstrap.bundle.min.js
@@ -41,14 +40,17 @@ async fn main() {
         }
     }
 
+    let conn = Arc::new(Mutex::new(
+        Connection::open("C:\\rust\\todo\\todo.db").expect("❌ Erreur de connexion"),
+    ));
+
     println!("Server starts on port : {port}");
     println!("Type http://localhost:{port} in your browser.");
 
     let mut env = Environment::new();
     views::template::add_template(&mut env);
-    // pass env to handlers via state
-    let app_state = Arc::new(AppState { env });
-    // Ajout des routes
+
+    let app_state = Arc::new(AppState { env, db: conn });
     let app = Router::new()
         .route("/", get(controllers::home::controller_home))
         .route("/task", get(controllers::task::index))
