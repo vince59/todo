@@ -1,6 +1,7 @@
 use chrono::{DateTime, Local};
-use rusqlite::{Connection, Result};
+use rusqlite::{params, Connection, Result};
 use serde::{Deserialize, Serialize};
+use tracing_subscriber::field::display;
 
 trait ToStr {
     fn to_str(&self) -> String;
@@ -155,13 +156,12 @@ impl Default for Task {
 }
 
 impl Task {
-    pub fn create(&self, conn: &Connection) -> Result<usize>{
-        conn.execute("INSERT INTO tasks 
-        (description, priority, importance, duration, creation_date, completion_date, due_date, status) 
-        VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, 8?)",
-        [&self.description, &self.priority.to_str(), &self.importance.to_str(), 
+    pub fn insert(&self, conn: &Connection) -> Result<usize>{
+        dbg!(&self.priority.to_str());
+        conn.execute("INSERT INTO tasks (description, priority, importance, duration, creation_date, completion_date, due_date, status) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, 8?);",
+        (&self.description, &self.priority.to_str(), &self.importance.to_str(), 
         &self.duration.to_str(), &self.creation_date.to_str(), &self.completion_date.to_str(), 
-        &self.due_date.to_str(), &self.status.to_str()])
+        &self.due_date.to_str(), &self.status.to_str()),)
     }
 
     pub fn get_all(conn: &Connection) -> Result<Vec<Task>> {

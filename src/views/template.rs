@@ -6,7 +6,9 @@ pub fn add_template(env: &mut Environment<'_>) {
     env.add_template("menu", include_str!("./layout/menu.html"))
         .unwrap();
     env.add_template("task.index", include_str!("./task/index.html"))
-    .unwrap();
+        .unwrap();
+    env.add_template("task.create", include_str!("./task/create.html"))
+        .unwrap();
     env.add_template("home", include_str!("./home.html"))
         .unwrap();
 }

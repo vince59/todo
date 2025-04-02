@@ -1,10 +1,18 @@
 use crate::AppState;
 use crate::models::task::Task;
-use axum::extract::State;
-use axum::http::StatusCode;
-use axum::response::Html;
-use minijinja::context;
+
 use std::sync::Arc;
+use axum::extract::State;
+use axum::{extract::Form,response::{Html,Redirect},http::StatusCode};
+use serde::Deserialize;
+use minijinja::context;
+
+
+#[derive(Deserialize, Debug)]
+#[allow(dead_code)]
+pub struct Input {
+    description: String,
+}
 
 pub async fn index(State(state): State<Arc<AppState>>) -> Result<Html<String>, StatusCode> {
     let template = state.env.get_template("task.index").unwrap();
@@ -23,4 +31,26 @@ pub async fn index(State(state): State<Arc<AppState>>) -> Result<Html<String>, S
         })
         .unwrap();
     Ok(Html(rendered))
+}
+
+pub async fn create(State(state): State<Arc<AppState>>) -> Result<Html<String>, StatusCode> {
+    let template = state.env.get_template("task.create").unwrap();
+    
+    let rendered = template
+        .render(context! {
+        })
+        .unwrap();
+    Ok(Html(rendered))
+}
+
+pub async fn insert( State(state): State<Arc<AppState>>, Form(input): Form<Input>,) -> Redirect  {
+    dbg!(&input);
+    let conn = state.db.lock().unwrap();
+
+    let task = Task { description:input.description, ..Task::default()};
+    let _ = task.insert(&conn).map_err(|err| {
+        eprintln!("Erreur sql: {:?}", err);
+        StatusCode::INTERNAL_SERVER_ERROR
+    }); 
+    Redirect::to("/task")
 }

@@ -1,28 +1,33 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top" data-bs-theme="dark">
   <div class="container-fluid">
-      <a class="navbar-brand" href="/">Todo</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item">
-                  <a class="nav-link active" href="/task">Nouvelle tâche</a>
-              </li>
-              <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Tableau de bord
-                  </a>
-                  <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="/">Truc</a></li>
-                      <li><a class="dropdown-item" href="/">Bidule</a></li>
-                  </ul>
-              </li>
+    <a class="navbar-brand" href="/">Todo</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" href="/task">Liste des taches</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/task/create">Nouvelle tâche</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Tableau de bord
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/">Truc</a></li>
+            <li><a class="dropdown-item" href="/">Bidule</a></li>
           </ul>
-          <form class="d-flex" role="search" action="/" method="POST">
-              <input id="" name="search_term" id="search_term" class="form-control me-2" type="search" placeholder="Recherche" aria-label="Search">
-              <button class="btn btn-outline-success" type="submit">Recherche</button>
-          </form>
-      </div>
+        </li>
+      </ul>
+      <form class="d-flex" role="search" action="/" method="POST">
+        <input id="" name="search_term" id="search_term" class="form-control me-2" type="search" placeholder="Recherche"
+          aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Recherche</button>
+      </form>
+    </div>
   </div>
 </nav>
