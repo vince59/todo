@@ -2,6 +2,30 @@ use chrono::{DateTime, Local};
 use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};
 
+trait ToStr {
+    fn to_str(&self) -> String;
+}
+
+impl ToStr for Option<DateTime<Local>> {
+    fn to_str(&self) -> String {
+        match self {
+            Some(date) => date.format("%Y-%m-%d %H:%M:%S").to_string(),
+            None => "".to_string(),
+        }
+    }
+}
+
+macro_rules! impl_to_str {
+    ($t:ty) => {
+        impl ToStr for $t {
+            fn to_str(&self) -> String {
+                (*self as u8).to_string()
+            }
+        }
+    };
+}
+
+#[repr(u8)]
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Serialize, Deserialize)]
 pub enum Priority {
     ToBeDefined,
@@ -25,6 +49,9 @@ impl ToString for Priority {
     }
 }
 
+impl_to_str!(Priority);
+
+#[repr(u8)]
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Serialize, Deserialize)]
 pub enum Importance {
     ToBeDefined,
@@ -48,7 +75,10 @@ impl ToString for Importance {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+impl_to_str!(Importance);
+
+#[repr(u8)]
+#[derive(Debug, Clone, Serialize, Deserialize, Copy)]
 pub enum Duration {
     ToBeDefined,
     VeryLong,
@@ -71,13 +101,29 @@ impl ToString for Duration {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+impl_to_str!(Duration);
+
+#[repr(u8)]
+#[derive(Debug, Clone, Serialize, Deserialize, Copy)]
 pub enum Status {
     ToDo,
     InProgress,
     Finished,
     Canceled,
 }
+
+impl ToString for Status {
+    fn to_string(&self) -> String {
+        match self {
+            Status::ToDo => "A faire".to_string(),
+            Status::InProgress => "En cours".to_string(),
+            Status::Finished => "Fini".to_string(),
+            Status::Canceled => "Annulé".to_string(),
+        }
+    }
+}
+
+impl_to_str!(Status);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {
@@ -109,9 +155,13 @@ impl Default for Task {
 }
 
 impl Task {
-    pub fn create(&self, conn: &Connection) {
-        let mut stmt = conn.execute("INSERT INTO tasks (description, priority, importance, duration, creation_date, completion_date, due_date, status) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, 8?)",
-        [&self.description, &self.priority.to_string(), &self.importance, &self.duration, &self.creation_date, &self.completion_date, &self.due_date, &self.status])?;
+    pub fn create(&self, conn: &Connection) -> Result<usize>{
+        conn.execute("INSERT INTO tasks 
+        (description, priority, importance, duration, creation_date, completion_date, due_date, status) 
+        VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, 8?)",
+        [&self.description, &self.priority.to_str(), &self.importance.to_str(), 
+        &self.duration.to_str(), &self.creation_date.to_str(), &self.completion_date.to_str(), 
+        &self.due_date.to_str(), &self.status.to_str()])
     }
 
     pub fn get_all(conn: &Connection) -> Result<Vec<Task>> {
