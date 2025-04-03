@@ -17,9 +17,41 @@
                 <div class="col-sm-10">
                     <select name="priority" id="priority" class="form-control border border-dark bg-light text-dark"
                         required>
-                        <option value="">Priorité</option>
-                        {% for (priority,name) in priorities %}
+                        {% for (priority,name) in all_priority %}
                             <option value="{{ priority }}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3 align-items-center">
+                <label for="importance" class="col-sm-2 col-form-label fw-bold">Importance</label>
+                <div class="col-sm-10">
+                    <select name="importance" id="importance" class="form-control border border-dark bg-light text-dark"
+                        required>
+                        {% for (importance,name) in all_importance %}
+                            <option value="{{ importance }}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3 align-items-center">
+                <label for="importance" class="col-sm-2 col-form-label fw-bold">Durée</label>
+                <div class="col-sm-10">
+                    <select name="duration" id="duration" class="form-control border border-dark bg-light text-dark"
+                        required>
+                        {% for (duration,name) in all_duration %}
+                            <option value="{{ duration }}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3 align-items-center">
+                <label for="status" class="col-sm-2 col-form-label fw-bold">Statut</label>
+                <div class="col-sm-10">
+                    <select name="status" id="status" class="form-control border border-dark bg-light text-dark"
+                        required>
+                        {% for (status,name) in all_status %}
+                            <option value="{{ status }}">{{ name }}</option>
                         {% endfor %}
                     </select>
                 </div>

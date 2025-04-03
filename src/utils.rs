@@ -1,4 +1,51 @@
+
 use std::env;
+use chrono::{DateTime, Local};
+pub trait ToStr {
+    fn to_str(&self) -> String;
+}
+
+impl ToStr for Option<DateTime<Local>> {
+    fn to_str(&self) -> String {
+        match self {
+            Some(date) => date.format("%Y-%m-%d %H:%M:%S").to_string(),
+            None => "".to_string(),
+        }
+    }
+}
+
+#[macro_export]
+macro_rules! enum_with_strings {
+    ($name:ident { $($variant:ident => $string:expr),* $(,)? }) => {
+        #[repr(u8)]
+        #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Serialize, Deserialize)]
+        pub enum $name {
+            $($variant),*
+        }
+
+        impl ToString for $name {
+            fn to_string(&self) -> String {
+                match self {
+                    $(Self::$variant => $string.to_string()),*
+                }
+            }
+        }
+
+        impl $name {
+            pub fn all() -> Vec<($name, String)> {
+                vec![
+                    $(($name::$variant, $string.to_string())),*
+                ]
+            }
+        }
+
+        impl ToStr for $name {
+            fn to_str(&self) -> String {
+                (*self as u8).to_string()
+            }
+        }
+    };
+}
 
 pub fn print_usage(){
     println!("Usage :");

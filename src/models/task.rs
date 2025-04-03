@@ -1,65 +1,12 @@
+use crate::enum_with_strings;
+use crate::utils::ToStr;
+
 use chrono::{DateTime, Local};
 use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};
 
-trait ToStr {
-    fn to_str(&self) -> String;
-}
-
-impl ToStr for Option<DateTime<Local>> {
-    fn to_str(&self) -> String {
-        match self {
-            Some(date) => date.format("%Y-%m-%d %H:%M:%S").to_string(),
-            None => "".to_string(),
-        }
-    }
-}
-
-// Macro pour convertir l'enum u8 en chaine représentant le chiffre
-macro_rules! impl_to_str {
-    ($t:ty) => {
-        impl ToStr for $t {
-            fn to_str(&self) -> String {
-                (*self as u8).to_string()
-            }
-        }
-    };
-}
-
-macro_rules! enum_with_strings {
-    ($name:ident { $($variant:ident => $string:expr),* $(,)? }) => {
-        #[repr(u8)]
-        #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Serialize, Deserialize)]
-        pub enum $name {
-            $($variant),*
-        }
-
-        impl ToString for $name {
-            fn to_string(&self) -> String {
-                match self {
-                    $(Self::$variant => $string.to_string()),*
-                }
-            }
-        }
-
-        impl $name {
-            pub fn all() -> Vec<($name, String)> {
-                vec![
-                    $(($name::$variant, $string.to_string())),*
-                ]
-            }
-        }
-
-        impl ToStr for $name {
-            fn to_str(&self) -> String {
-                (*self as u8).to_string()
-            }
-        }
-    };
-}
-
 enum_with_strings!(Priority {
-    ToBeDefined => "À définir",
+    ToBeDefined => "A définir",
     VeryUrgent => "Très urgent",
     Urgent => "Urgent",
     Normal => "Normal",
@@ -67,122 +14,30 @@ enum_with_strings!(Priority {
     NotAtAllUrgent => "Pas du tout urgent",
 });
 
-/* 
-#[repr(u8)]
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Serialize, Deserialize)]
-pub enum Priority {
-    ToBeDefined,
-    VeryUrgent,
-    Urgent,
-    Normal,
-    NotUrgent,
-    NotAtAllUrgent,
-}
+enum_with_strings!(Importance {
+    ToBeDefined => "A définir",
+    VeryImportant => "Très important",
+    Important => "Important",
+    Normal => "Normal",
+    NotImportant => "Pas important",
+    NotAtAllImportant => "Pas du tout important",
+});
 
-impl ToString for Priority {
-    fn to_string(&self) -> String {
-        match self {
-            Priority::ToBeDefined => "À définir".to_string(),
-            Priority::VeryUrgent => "Très urgent".to_string(),
-            Priority::Urgent => "Urgent".to_string(),
-            Priority::Normal => "Normal".to_string(),
-            Priority::NotUrgent => "Pas urgent".to_string(),
-            Priority::NotAtAllUrgent => "Pas du tout urgent".to_string(),
-        }
-    }
-}
+enum_with_strings!(Duration {
+    ToBeDefined => "A définir",
+    VeryLong => "Très long",
+    Long => "Long",
+    Normal => "Normal",
+    Short => "Rapide",
+    VeryShort => "Très court",
+});
 
-impl Priority {
-    pub fn all() -> Vec<Priority> {
-        vec![Priority::ToBeDefined,
-        Priority::VeryUrgent,
-        Priority::Urgent,
-        Priority::Normal,
-        Priority::NotUrgent,
-        Priority::NotAtAllUrgent]
-    }
-
-    pub fn all_key_value() -> Vec<(Priority, String)> {
-        Self::all().iter().map(|&p| (p, p.to_string())).collect()
-    }
-}
-
-impl_to_str!(Priority);
-*/
-
-#[repr(u8)]
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Serialize, Deserialize)]
-pub enum Importance {
-    ToBeDefined,
-    VeryImportant,
-    Important,
-    Normal,
-    NotImportant,
-    NotAtAllImportant,
-}
-
-impl ToString for Importance {
-    fn to_string(&self) -> String {
-        match self {
-            Importance::ToBeDefined => "À définir".to_string(),
-            Importance::VeryImportant => "Très important".to_string(),
-            Importance::Important => "Important".to_string(),
-            Importance::Normal => "Normal".to_string(),
-            Importance::NotImportant => "Pas important".to_string(),
-            Importance::NotAtAllImportant => "Pas du tout important".to_string(),
-        }
-    }
-}
-
-impl_to_str!(Importance);
-
-#[repr(u8)]
-#[derive(Debug, Clone, Serialize, Deserialize, Copy)]
-pub enum Duration {
-    ToBeDefined,
-    VeryLong,
-    Long,
-    Normal,
-    Short,
-    VeryShort,
-}
-
-impl ToString for Duration {
-    fn to_string(&self) -> String {
-        match self {
-            Duration::ToBeDefined => "À définir".to_string(),
-            Duration::VeryLong => "Très long".to_string(),
-            Duration::Long => "Long".to_string(),
-            Duration::Normal => "Normal".to_string(),
-            Duration::Short => "Rapide".to_string(),
-            Duration::VeryShort => "Très court".to_string(),
-        }
-    }
-}
-
-impl_to_str!(Duration);
-
-#[repr(u8)]
-#[derive(Debug, Clone, Serialize, Deserialize, Copy)]
-pub enum Status {
-    ToDo,
-    InProgress,
-    Finished,
-    Canceled,
-}
-
-impl ToString for Status {
-    fn to_string(&self) -> String {
-        match self {
-            Status::ToDo => "A faire".to_string(),
-            Status::InProgress => "En cours".to_string(),
-            Status::Finished => "Fini".to_string(),
-            Status::Canceled => "Annulé".to_string(),
-        }
-    }
-}
-
-impl_to_str!(Status);
+enum_with_strings!(Status {
+    ToDo => "A faire",
+    InProgress => "En cours",
+    Finished => "Fini",
+    Canceled => "Annulé",
+});
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {
@@ -215,7 +70,6 @@ impl Default for Task {
 
 impl Task {
     pub fn insert(&self, conn: &Connection) -> Result<usize>{
-        dbg!(&self.priority.to_str());
         conn.execute("INSERT INTO tasks (description, priority, importance, duration, creation_date, completion_date, due_date, status) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8);",
         (&self.description, &self.priority.to_str(), &self.importance.to_str(), 
         &self.duration.to_str(), &self.creation_date.to_str(), &self.completion_date.to_str(), 
