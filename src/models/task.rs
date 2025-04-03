@@ -1,7 +1,6 @@
 use chrono::{DateTime, Local};
-use rusqlite::{params, Connection, Result};
+use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};
-use tracing_subscriber::field::display;
 
 trait ToStr {
     fn to_str(&self) -> String;
@@ -16,6 +15,7 @@ impl ToStr for Option<DateTime<Local>> {
     }
 }
 
+// Macro pour convertir l'enum u8 en chaine représentant le chiffre
 macro_rules! impl_to_str {
     ($t:ty) => {
         impl ToStr for $t {
@@ -26,6 +26,48 @@ macro_rules! impl_to_str {
     };
 }
 
+macro_rules! enum_with_strings {
+    ($name:ident { $($variant:ident => $string:expr),* $(,)? }) => {
+        #[repr(u8)]
+        #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Serialize, Deserialize)]
+        pub enum $name {
+            $($variant),*
+        }
+
+        impl ToString for $name {
+            fn to_string(&self) -> String {
+                match self {
+                    $(Self::$variant => $string.to_string()),*
+                }
+            }
+        }
+
+        impl $name {
+            pub fn all() -> Vec<($name, String)> {
+                vec![
+                    $(($name::$variant, $string.to_string())),*
+                ]
+            }
+        }
+
+        impl ToStr for $name {
+            fn to_str(&self) -> String {
+                (*self as u8).to_string()
+            }
+        }
+    };
+}
+
+enum_with_strings!(Priority {
+    ToBeDefined => "À définir",
+    VeryUrgent => "Très urgent",
+    Urgent => "Urgent",
+    Normal => "Normal",
+    NotUrgent => "Pas urgent",
+    NotAtAllUrgent => "Pas du tout urgent",
+});
+
+/* 
 #[repr(u8)]
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Serialize, Deserialize)]
 pub enum Priority {
@@ -50,7 +92,23 @@ impl ToString for Priority {
     }
 }
 
+impl Priority {
+    pub fn all() -> Vec<Priority> {
+        vec![Priority::ToBeDefined,
+        Priority::VeryUrgent,
+        Priority::Urgent,
+        Priority::Normal,
+        Priority::NotUrgent,
+        Priority::NotAtAllUrgent]
+    }
+
+    pub fn all_key_value() -> Vec<(Priority, String)> {
+        Self::all().iter().map(|&p| (p, p.to_string())).collect()
+    }
+}
+
 impl_to_str!(Priority);
+*/
 
 #[repr(u8)]
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Serialize, Deserialize)]
@@ -158,7 +216,7 @@ impl Default for Task {
 impl Task {
     pub fn insert(&self, conn: &Connection) -> Result<usize>{
         dbg!(&self.priority.to_str());
-        conn.execute("INSERT INTO tasks (description, priority, importance, duration, creation_date, completion_date, due_date, status) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, 8?);",
+        conn.execute("INSERT INTO tasks (description, priority, importance, duration, creation_date, completion_date, due_date, status) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8);",
         (&self.description, &self.priority.to_str(), &self.importance.to_str(), 
         &self.duration.to_str(), &self.creation_date.to_str(), &self.completion_date.to_str(), 
         &self.due_date.to_str(), &self.status.to_str()),)

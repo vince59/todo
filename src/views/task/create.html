@@ -6,12 +6,24 @@
     <div class="p-4 bg-warning border rounded shadow">
         <form action="/task/create" method="POST">
             <div class="row mb-3 align-items-center">
-                <label for="date" class="col-sm-2 col-form-label fw-bold">Contenu</label>
+                <label for="date" class="col-sm-2 col-form-label fw-bold">Description</label>
                 <div class="col-sm-10">
-                    <input type="text" name="description" id="description" class="form-control border border-dark bg-light text-dark" required>
+                    <input type="text" name="description" id="description"
+                        class="form-control border border-dark bg-light text-dark" required>
                 </div>
             </div>
-            
+            <div class="row mb-3 align-items-center">
+                <label for="priority" class="col-sm-2 col-form-label fw-bold">Priorité</label>
+                <div class="col-sm-10">
+                    <select name="priority" id="priority" class="form-control border border-dark bg-light text-dark"
+                        required>
+                        <option value="">Priorité</option>
+                        {% for (priority,name) in priorities %}
+                            <option value="{{ priority }}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
             <button type="submit" class="btn btn-success">Enregistrer</button>
             <a href="/" class="btn btn-secondary">Annuler</a>
         </form>

@@ -1,6 +1,5 @@
 use crate::AppState;
-use crate::models::task::Task;
-
+use crate::models::task::{Task,Priority};
 use std::sync::Arc;
 use axum::extract::State;
 use axum::{extract::Form,response::{Html,Redirect},http::StatusCode};
@@ -12,6 +11,7 @@ use minijinja::context;
 #[allow(dead_code)]
 pub struct Input {
     description: String,
+    priority: Priority
 }
 
 pub async fn index(State(state): State<Arc<AppState>>) -> Result<Html<String>, StatusCode> {
@@ -38,6 +38,7 @@ pub async fn create(State(state): State<Arc<AppState>>) -> Result<Html<String>, 
     
     let rendered = template
         .render(context! {
+            priorities => Priority::all()
         })
         .unwrap();
     Ok(Html(rendered))
@@ -47,7 +48,7 @@ pub async fn insert( State(state): State<Arc<AppState>>, Form(input): Form<Input
     dbg!(&input);
     let conn = state.db.lock().unwrap();
 
-    let task = Task { description:input.description, ..Task::default()};
+    let task = Task { description:input.description, priority:input.priority, ..Task::default()};
     let _ = task.insert(&conn).map_err(|err| {
         eprintln!("Erreur sql: {:?}", err);
         StatusCode::INTERNAL_SERVER_ERROR
