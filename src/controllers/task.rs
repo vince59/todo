@@ -34,6 +34,10 @@ pub async fn index(State(state): State<Arc<AppState>>) -> Result<Html<String>, S
         .render(context! {
             title => "Todo liste",
             tasks => tasks,
+            all_priority => Priority::all(),
+            all_importance => Importance::all(),
+            all_duration => Duration::all(),
+            all_status => Status::all(),
         })
         .unwrap();
     Ok(Html(rendered))

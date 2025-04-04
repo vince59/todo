@@ -11,7 +11,6 @@ enum_with_strings!(Priority {
     Urgent => "Urgent",
     Normal => "Normal",
     NotUrgent => "Pas urgent",
-    NotAtAllUrgent => "Pas du tout urgent",
 });
 
 enum_with_strings!(Importance {
@@ -19,8 +18,7 @@ enum_with_strings!(Importance {
     VeryImportant => "Très important",
     Important => "Important",
     Normal => "Normal",
-    NotImportant => "Pas important",
-    NotAtAllImportant => "Pas du tout important",
+    NotImportant => "Pas important"
 });
 
 enum_with_strings!(Duration {
@@ -50,6 +48,7 @@ pub struct Task {
     pub completion_date: NaiveDate,
     pub due_date: NaiveDate,
     pub status: Status,
+    pub grouping: String,
 }
 
 impl Default for Task {
@@ -64,20 +63,21 @@ impl Default for Task {
             completion_date: Local::now().date_naive(),
             due_date: Local::now().date_naive(),
             status: Status::ToDo,
+            grouping:"".to_string()
         }
     }
 }
 
 impl Task {
     pub fn insert(&self, conn: &Connection) -> Result<usize>{
-        conn.execute("INSERT INTO tasks (description, priority, importance, duration, creation_date, completion_date, due_date, status) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8);",
+        conn.execute("INSERT INTO tasks (description, priority, importance, duration, creation_date, completion_date, due_date, status, grouping) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9);",
         (&self.description, &self.priority, &self.importance, 
         &self.duration, &self.creation_date, &self.completion_date, 
-        &self.due_date, &self.status),)
+        &self.due_date, &self.status, &self.grouping),)
     }
 
     pub fn get_all(conn: &Connection) -> Result<Vec<Task>> {
-        let mut stmt = conn.prepare("SELECT id,description, priority, importance, duration, creation_date, completion_date, due_date, status FROM tasks")?;
+        let mut stmt = conn.prepare("SELECT id,description, priority, importance, duration, creation_date, completion_date, due_date, status, grouping FROM tasks")?;
         let tasks_iter = stmt.query_map([], |row| {
             Ok(Task {
                 id: row.get(0)?,
@@ -88,7 +88,8 @@ impl Task {
                 creation_date: row.get(5)?,
                 completion_date: row.get(6)?,
                 due_date: row.get(7)?,
-                status: row.get(8)?
+                status: row.get(8)?,
+                grouping: row.get(9)?,
             })
         })?;
 

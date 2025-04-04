@@ -18,11 +18,53 @@
     <tbody>
         {% for task in tasks %}
         <tr class="table-primary">
-            <td>{{ task.status}}</td>
-            <td>{{ task.description }}</td>
-            <td>{{ task.priority }}</td>
-            <td>{{ task.importance }}</td>
-            <td>{{ task.duration }}</td>
+            <td>
+                <select name="status" id="status" required>
+                    {% for (status,name) in all_status %}
+                        {% if task.status==status %}
+                            <option value="{{ status }}" selected>{{ name }}</option>
+                        {% else %}
+                            <option value="{{ status }}">{{ name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </td>
+            <td>
+                {{ task.description }}
+            </td>
+            <td>
+                <select name="priority" id="priority" required>
+                    {% for (priority,name) in all_priority %}
+                        {% if task.priority==priority %}
+                            <option value="{{ task.priority }}" selected>{{ name }}</option>
+                        {% else %}
+                            <option value="{{ task.priority }}">{{ name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </td>
+            <td>
+                <select name="importance" id="importance" required>
+                    {% for (importance,name) in all_importance %}
+                        {% if task.importance==importance %}
+                            <option value="{{ task.importance }}" selected>{{ name }}</option>
+                        {% else %}
+                            <option value="{{ task.importance }}">{{ name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>                
+            </td>
+            <td>
+                <select name="duration" id="duration" required>
+                    {% for (duration,name) in all_duration %}
+                        {% if task.duration==durationy %}
+                            <option value="{{ task.duration }}" selected>{{ name }}</option>
+                        {% else %}
+                            <option value="{{ task.duration }}">{{ name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>               
+            </td>
             <td>{{ task.creation_date }}</td>
             <td>{{ task.completion_date }}</td>
             <td>
