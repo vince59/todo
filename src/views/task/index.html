@@ -5,16 +5,26 @@
 <table class="table table-bordered">
     <thead class="table-dark">
         <tr>
-            <th>Code</th>
-            <th>Nom</th>
-            <th>Actions</th>
+            <th>Statut</th>
+            <th>Description</th>
+            <th>Priorité</th>
+            <th>Importance</th>
+            <th>Durée</th>
+            <th>Créé le</th>
+            <th>Fini le</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
         {% for task in tasks %}
         <tr class="table-primary">
-            <td>toto</td>
+            <td>{{ task.status}}</td>
             <td>{{ task.description }}</td>
+            <td>{{ task.priority }}</td>
+            <td>{{ task.importance }}</td>
+            <td>{{ task.duration }}</td>
+            <td>{{ task.creation_date }}</td>
+            <td>{{ task.completion_date }}</td>
             <td>
                 <a href="/" class="btn btn-warning btn-sm">Modifier</a>
                 <form action="/" method="POST" style="display:inline-block;">

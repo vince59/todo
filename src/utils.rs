@@ -1,19 +1,8 @@
 
 use std::env;
-use chrono::{DateTime, Local};
-pub trait ToStr {
-    fn to_str(&self) -> String;
-}
 
-impl ToStr for Option<DateTime<Local>> {
-    fn to_str(&self) -> String {
-        match self {
-            Some(date) => date.format("%Y-%m-%d %H:%M:%S").to_string(),
-            None => "".to_string(),
-        }
-    }
-}
-
+// Macro permettant de déclarer un enum automatiquement et d'implémenter les traits pour sql
+// et pour avoir un texte associé à l'enum
 #[macro_export]
 macro_rules! enum_with_strings {
     ($name:ident { $($variant:ident => $string:expr),* $(,)? }) => {
@@ -23,6 +12,7 @@ macro_rules! enum_with_strings {
             $($variant),*
         }
 
+        // retourne le texte associé à la valeur de l'enum (pour l'affichage dans les vues)
         impl ToString for $name {
             fn to_string(&self) -> String {
                 match self {
@@ -31,6 +21,22 @@ macro_rules! enum_with_strings {
             }
         }
 
+        // converti la valeur entière de sql dans la bonne occurence de de l'enum 
+        impl FromSql for $name {
+            fn column_result(value: ValueRef<'_>) -> Result<$name, FromSqlError> {
+                match value.as_i64()? as u8 {
+                    $(
+                        x if x == $name::$variant as u8 => Ok($name::$variant),
+                    )*
+                    _ => Err(FromSqlError::Other(
+                        format!("Invalid {} value", stringify!($name)).into()
+                    )),
+                }
+            }
+        }
+
+        // Ajoute une fonction qui retourne un vecteur avec pour chaque occurence de l'enum un tuple
+        // comprenant l'occurence de l'enum et son texte (pour affichage dans les vues)
         impl $name {
             pub fn all() -> Vec<($name, String)> {
                 vec![
@@ -39,9 +45,9 @@ macro_rules! enum_with_strings {
             }
         }
 
-        impl ToStr for $name {
-            fn to_str(&self) -> String {
-                (*self as u8).to_string()
+        impl ToSql for $name {
+            fn to_sql(&self) -> Result<ToSqlOutput<'_>> {
+                Ok(ToSqlOutput::from(*self as u8))
             }
         }
     };

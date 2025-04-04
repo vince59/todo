@@ -11,5 +11,5 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 minijinja = "2.3.1"
 chrono = { version = "0.4", features = ["serde"] }
-rusqlite = { version = "0.34.0", features = ["bundled"] }
+rusqlite = { version = "0.34.0", features = ["bundled","chrono"] }
 
