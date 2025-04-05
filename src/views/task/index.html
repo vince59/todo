@@ -11,7 +11,7 @@
             <th>Importance</th>
             <th>Durée</th>
             <th>Créé le</th>
-            <th>Fini le</th>
+            <th>Commencé le</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -22,11 +22,13 @@
                 {% for (status,name) in all_status %}
                     {% if task.status==status %}
                         {% if task.status=='ToDo' %}
-                            <a href="/task/{{ task.id }}/start" class="btn btn-secondary btn-sm">{{ name }}</a>
+                            <a href="/task/{{ task.id }}/update_status?status=InProgress" class="btn btn-secondary btn-sm">{{ name }}</a>
                         {% elif task.status=='InProgress' %}
-                            <a href="/task/{{ task.id }}/complete" class="btn btn-warning btn-sm">{{ name }}</a>
+                            <a href="/task/{{ task.id }}/update_status?status=Finished" class="btn btn-warning btn-sm">{{ name }}</a>
                         {% elif task.status=='Finished' %}
                             <a href="" class="btn btn-success btn-sm">{{ name }}</a>
+                        {% elif task.status=='Blocked' %}
+                            <a href="" class="btn btn-danger btn-sm">{{ name }}</a>
                         {% else %}
                             <a href="" class="btn btn-light btn-sm">{{ name }}</a>
                         {% endif %}
@@ -56,8 +58,8 @@
                     {% endif %}
                 {% endfor %}         
             </td>
-            <td>{{ task.creation_date }}</td>
-            <td>{{ task.completion_date }}</td>
+            <td>{{ task.creation_date | format_date }}</td>
+            <td>{{ task.start_date | format_date }}</td>
             <td>
                 <a href="/task/{{ task.id }}/edit" class="btn btn-warning btn-sm">Modifier</a>
                 <form action="/task/{{ task.id }}/delete" method="GET" style="display:inline-block;">

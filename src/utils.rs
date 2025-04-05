@@ -1,5 +1,6 @@
-
 use std::env;
+use chrono::NaiveDate;
+use minijinja::{value::Value, Error};
 
 // Macro permettant de déclarer un enum automatiquement et d'implémenter les traits pour sql
 // et pour avoir un texte associé à l'enum
@@ -76,5 +77,19 @@ pub fn get_port_from_args() -> Result<u16, String> {
         }
     } else {
         Ok(default_port)
+    }
+}
+
+// filtre de template pour afficher les dates en jj/mm/aa dans la template en laissant le format AAA-MM-JJ dans la bdd
+
+pub fn format_date(value: Value) -> Result<Value, Error> {
+    if let Some(date_str) = value.as_str() {
+        let date_opt = NaiveDate::parse_from_str(date_str, "%Y-%m-%d").ok();
+        match date_opt {
+            Some(date) => Ok(Value::from(date.format("%d/%m/%y").to_string())),
+            None => Ok(Value::from("")),
+        }
+    } else {
+        Ok(Value::from(""))
     }
 }

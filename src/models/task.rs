@@ -35,6 +35,7 @@ enum_with_strings!(Status {
     InProgress => "En cours",
     Finished => "Fini",
     Canceled => "Annulé",
+    Blocked => "Bloqué",
 });
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -127,5 +128,14 @@ impl Task {
 
     pub fn delete(id:u32, conn: &Connection)-> Result<usize>{
         conn.execute("DELETE FROM tasks WHERE id=?1;",params![id],)
+    }
+
+    pub fn update_status(id:u32, status:Status,conn: &Connection)-> Result<usize>{
+        let rqt = match status {
+            Status::Finished => "UPDATE tasks SET status = ?1, completion_date = ?2 WHERE id=?3;",
+            Status::InProgress => "UPDATE tasks SET status = ?1, start_date = ?2 WHERE id=?3;",
+            _ => "UPDATE tasks SET status = ?1 WHERE id=?3;"
+        };
+        conn.execute(rqt,params![status,Local::now().date_naive(),id],)
     }
 }

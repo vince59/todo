@@ -1,6 +1,6 @@
 use crate::AppState;
 use crate::models::task::{Duration, Importance, Priority, Status, Task};
-use axum::extract::{Form, Path, State};
+use axum::extract::{Form, Path, Query, State};
 use axum::{
     http::StatusCode,
     response::{Html, Redirect},
@@ -18,6 +18,11 @@ pub struct Input {
     duration: Duration,
     status: Status,
     grouping: String,
+}
+
+#[derive(Deserialize)]
+pub struct StatusParam {
+    status: Status,
 }
 
 // retourne toutes les tâches
@@ -145,40 +150,19 @@ pub async fn delete(Path(id): Path<u32>, State(state): State<Arc<AppState>>) -> 
     Redirect::to("/task")
 }
 
-// Termine une tâche
+// Met à jour le statut de la tâche
 
-pub async fn complete(Path(id): Path<u32>, State(state): State<Arc<AppState>>) -> Redirect {
+pub async fn update_status(
+    Path(id): Path<u32>,
+    Query(param): Query<StatusParam>,
+    State(state): State<Arc<AppState>>,
+) -> Redirect {
     let conn = state.db.lock().unwrap();
 
-    match Task::get_by_id(id, &conn) {
-        Ok(mut task) => {
-            task.status = Status::Finished;
-            let _ = task.update(id, &conn).map_err(|err| {
-                eprintln!("Erreur sql: {:?}", err);
-            });
-        }
-        Err(err) => {
-            eprintln!("Erreur sql: {:?}", err);
-        }
-    }
-    Redirect::to("/task")
-}
+    let _ = Task::update_status(id, param.status, &conn).map_err(|err| {
+        eprintln!("Erreur sql: {:?}", err);
+        StatusCode::INTERNAL_SERVER_ERROR
+    });
 
-// Démarre une tache
-
-pub async fn start(Path(id): Path<u32>, State(state): State<Arc<AppState>>) -> Redirect {
-    let conn = state.db.lock().unwrap();
-
-    match Task::get_by_id(id, &conn) {
-        Ok(mut task) => {
-            task.status = Status::InProgress;
-            let _ = task.update(id, &conn).map_err(|err| {
-                eprintln!("Erreur sql: {:?}", err);
-            });
-        }
-        Err(err) => {
-            eprintln!("Erreur sql: {:?}", err);
-        }
-    }
     Redirect::to("/task")
 }
