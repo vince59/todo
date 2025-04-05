@@ -9,6 +9,8 @@ pub fn add_template(env: &mut Environment<'_>) {
         .unwrap();
     env.add_template("task.create", include_str!("./task/create.html"))
         .unwrap();
+    env.add_template("task.edit", include_str!("./task/edit.html"))
+        .unwrap();
     env.add_template("home", include_str!("./home.html"))
         .unwrap();
 }

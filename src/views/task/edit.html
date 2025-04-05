@@ -2,13 +2,14 @@
 {% block title %}{{ super() }} | {{ title }} {% endblock %}
 {% block body %}
 <div class="container mt-5">
-    <h3 class="text-center">Ajouter une tâche</h3>
+    <h3 class="text-center">Modifier une tâche</h3>
     <div class="p-4 bg-warning border rounded shadow">
-        <form action="/task/create" method="POST">
+        <form action="/task/{{ task.id }}/edit" method="POST">
+            <input type="hidden" value="{{ task.id }}">
             <div class="row mb-3 align-items-center">
                 <label for="description" class="col-sm-2 col-form-label fw-bold">Description</label>
                 <div class="col-sm-10">
-                    <textarea type="text" name="description" id="description" rows="3" class="form-control border border-dark bg-light text-dark" required></textarea>
+                    <textarea type="text" name="description" id="description" rows="3" class="form-control border border-dark bg-light text-dark" required>{{ task.description }}</textarea>
                 </div>
             </div>
             <div class="row mb-3 align-items-center">
@@ -16,7 +17,11 @@
                 <div class="col-sm-10">
                     <select name="priority" id="priority" class="form-control border border-dark bg-light text-dark" required>
                         {% for (priority,name) in all_priority %}
-                            <option value="{{ priority }}">{{ name }}</option>
+                            {% if task.priority==priority %}
+                                <option value="{{ priority }}" selected>{{ name }}</option>
+                            {% else %}
+                                <option value="{{ priority }}">{{ name }}</option>
+                            {% endif %}
                         {% endfor %}
                     </select>
                 </div>
@@ -26,17 +31,25 @@
                 <div class="col-sm-10">
                     <select name="importance" id="importance" class="form-control border border-dark bg-light text-dark" required>
                         {% for (importance,name) in all_importance %}
-                            <option value="{{ importance }}">{{ name }}</option>
+                            {% if task.importance==importance %}
+                                <option value="{{ importance }}" selected>{{ name }}</option>
+                            {% else %}
+                                <option value="{{ importance }}">{{ name }}</option>
+                            {% endif %}
                         {% endfor %}
                     </select>
                 </div>
             </div>
             <div class="row mb-3 align-items-center">
-                <label for="importance" class="col-sm-2 col-form-label fw-bold">Durée</label>
+                <label for="duration" class="col-sm-2 col-form-label fw-bold">Durée</label>
                 <div class="col-sm-10">
                     <select name="duration" id="duration" class="form-control border border-dark bg-light text-dark" required>
                         {% for (duration,name) in all_duration %}
-                            <option value="{{ duration }}">{{ name }}</option>
+                            {% if task.duration==duration %}
+                                <option value="{{ duration }}" selected>{{ name }}</option>
+                            {% else %}
+                                <option value="{{ duration }}">{{ name }}</option>
+                            {% endif %}
                         {% endfor %}
                     </select>
                 </div>
@@ -46,7 +59,11 @@
                 <div class="col-sm-10">
                     <select name="status" id="status" class="form-control border border-dark bg-light text-dark" required>
                         {% for (status,name) in all_status %}
-                            <option value="{{ status }}">{{ name }}</option>
+                            {% if task.status==status %}
+                                <option value="{{ status }}" selected>{{ name }}</option>
+                            {% else %}
+                                <option value="{{ status }}">{{ name }}</option>
+                            {% endif %}
                         {% endfor %}
                     </select>
                 </div>
@@ -54,7 +71,7 @@
             <div class="row mb-3 align-items-center">
                 <label for="grouping" class="col-sm-2 col-form-label fw-bold">Regroupement</label>
                 <div class="col-sm-10">
-                    <input type="text" name="grouping" id="grouping" class="form-control border border-dark bg-light text-dark" required>
+                    <input type="text" name="grouping" id="grouping" value="{{ task.grouping }}" class="form-control border border-dark bg-light text-dark">
                 </div>
             </div>
             <button type="submit" class="btn btn-success">Enregistrer</button>

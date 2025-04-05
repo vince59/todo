@@ -55,6 +55,8 @@ async fn main() {
         .route("/", get(controllers::home::controller_home))
         .route("/task", get(controllers::task::index))
         .route("/task/create", get(controllers::task::create).post(controllers::task::insert),)
+        .route("/task/{id}/edit", get(controllers::task::edit).post(controllers::task::update),)
+        .route("/task/{id}/delete", get(controllers::task::edit).post(controllers::task::delete),)
         .route("/css/bootstrap.min.css", get(serve_bootstrap_css))
         .route("/js/bootstrap.bundle.min.js", get(serve_bootstrap_js))
         .with_state(app_state);

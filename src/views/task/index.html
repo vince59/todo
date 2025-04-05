@@ -19,61 +19,51 @@
         {% for task in tasks %}
         <tr class="table-primary">
             <td>
-                <select name="status" id="status" required>
-                    {% for (status,name) in all_status %}
-                        {% if task.status==status %}
-                            <option value="{{ status }}" selected>{{ name }}</option>
+                {% for (status,name) in all_status %}
+                    {% if task.status==status %}
+                        {% if task.status=='ToDo' %}
+                            <a href="" class="btn btn-secondary btn-sm">{{ name }}</a>
+                        {% elif task.status=='InProgress' %}
+                            <a href="" class="btn btn-warning btn-sm">{{ name }}</a>
+                        {% elif task.status=='Finished' %}
+                            <a href="" class="btn btn-success btn-sm">{{ name }}</a>
                         {% else %}
-                            <option value="{{ status }}">{{ name }}</option>
+                            <a href="" class="btn btn-light btn-sm">{{ name }}</a>
                         {% endif %}
-                    {% endfor %}
-                </select>
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>{{ task.description }}</td>
+            <td>
+                {% for (priority,name) in all_priority %}
+                    {% if task.priority==priority %}
+                        {{ name }}
+                    {% endif %}
+                {% endfor %}
             </td>
             <td>
-                {{ task.description }}
-            </td>
-            <td>
-                <select name="priority" id="priority" required>
-                    {% for (priority,name) in all_priority %}
-                        {% if task.priority==priority %}
-                            <option value="{{ task.priority }}" selected>{{ name }}</option>
-                        {% else %}
-                            <option value="{{ task.priority }}">{{ name }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-            </td>
-            <td>
-                <select name="importance" id="importance" required>
-                    {% for (importance,name) in all_importance %}
-                        {% if task.importance==importance %}
-                            <option value="{{ task.importance }}" selected>{{ name }}</option>
-                        {% else %}
-                            <option value="{{ task.importance }}">{{ name }}</option>
-                        {% endif %}
-                    {% endfor %}
+                {% for (importance,name) in all_importance %}
+                    {% if task.importance==importance %}
+                        {{ name }}
+                    {% endif %}
+                {% endfor %}
                 </select>                
             </td>
             <td>
-                <select name="duration" id="duration" required>
-                    {% for (duration,name) in all_duration %}
-                        {% if task.duration==durationy %}
-                            <option value="{{ task.duration }}" selected>{{ name }}</option>
-                        {% else %}
-                            <option value="{{ task.duration }}">{{ name }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>               
+                {% for (duration,name) in all_duration %}
+                    {% if task.duration==duration %}
+                        {{ name }}
+                    {% endif %}
+                {% endfor %}         
             </td>
             <td>{{ task.creation_date }}</td>
             <td>{{ task.completion_date }}</td>
             <td>
-                <a href="/" class="btn btn-warning btn-sm">Modifier</a>
-                <form action="/" method="POST" style="display:inline-block;">
+                <a href="/task/{{ task.id }}/edit" class="btn btn-warning btn-sm">Modifier</a>
+                <form action="/task/{{ task.id }}/delete" method="POST" style="display:inline-block;">
                     <button type="submit" class="btn btn-danger btn-sm"
                         onclick="return confirm('Etes vous sûr ?')">Supprimer</button>
                 </form>
-                <a href="/" target="_blank" class="btn btn-secondary btn-sm">Autre</a>
             </td>
         </tr>
         {% endfor %}
