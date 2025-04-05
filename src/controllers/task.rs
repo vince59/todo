@@ -20,7 +20,8 @@ pub struct Input {
     grouping: String,
 }
 
-// retourne le contenu de la table
+// retourne toutes les tâches
+
 pub async fn index(State(state): State<Arc<AppState>>) -> Result<Html<String>, StatusCode> {
     let template = state.env.get_template("task.index").unwrap();
 
@@ -44,7 +45,8 @@ pub async fn index(State(state): State<Arc<AppState>>) -> Result<Html<String>, S
     Ok(Html(rendered))
 }
 
-// retourne le formulaire de création
+// retourne le formulaire de création de tache
+
 pub async fn create(State(state): State<Arc<AppState>>) -> Result<Html<String>, StatusCode> {
     let template = state.env.get_template("task.create").unwrap();
 
@@ -59,7 +61,7 @@ pub async fn create(State(state): State<Arc<AppState>>) -> Result<Html<String>, 
     Ok(Html(rendered))
 }
 
-// insert les données en base et renvoie sur index
+// ajoute une nouvelle tâche en base
 
 pub async fn insert(State(state): State<Arc<AppState>>, Form(input): Form<Input>) -> Redirect {
     let conn = state.db.lock().unwrap();
@@ -79,7 +81,7 @@ pub async fn insert(State(state): State<Arc<AppState>>, Form(input): Form<Input>
     Redirect::to("/task")
 }
 
-// retourne le formulaire de mise à jour pour un id donné
+// retourne le formulaire de mise à jour pour une tache donnée
 
 pub async fn edit(
     Path(id): Path<u32>,
@@ -106,7 +108,7 @@ pub async fn edit(
     Ok(Html(rendered))
 }
 
-// met à jour les données en base et renvoie sur index
+// met à jour les données d'une tâche en base et renvoie sur index
 
 pub async fn update(
     Path(id): Path<u32>,
