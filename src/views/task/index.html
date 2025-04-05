@@ -22,9 +22,9 @@
                 {% for (status,name) in all_status %}
                     {% if task.status==status %}
                         {% if task.status=='ToDo' %}
-                            <a href="" class="btn btn-secondary btn-sm">{{ name }}</a>
+                            <a href="/task/{{ task.id }}/start" class="btn btn-secondary btn-sm">{{ name }}</a>
                         {% elif task.status=='InProgress' %}
-                            <a href="" class="btn btn-warning btn-sm">{{ name }}</a>
+                            <a href="/task/{{ task.id }}/complete" class="btn btn-warning btn-sm">{{ name }}</a>
                         {% elif task.status=='Finished' %}
                             <a href="" class="btn btn-success btn-sm">{{ name }}</a>
                         {% else %}
