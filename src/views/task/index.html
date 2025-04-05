@@ -61,7 +61,9 @@
             <td>{{ task.creation_date | format_date }}</td>
             <td>{{ task.start_date | format_date }}</td>
             <td>
-                <a href="/task/{{ task.id }}/edit" class="btn btn-warning btn-sm">Modifier</a>
+                <form action="/task/{{ task.id }}/edit" method="GET" style="display:inline-block;">
+                    <button type="submit" class="btn btn-warning btn-sm">Modifier</button>
+                </form>
                 <form action="/task/{{ task.id }}/delete" method="GET" style="display:inline-block;">
                     <button type="submit" class="btn btn-danger btn-sm"
                         onclick="return confirm('Etes vous sûr ?')">Supprimer</button>

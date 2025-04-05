@@ -3,6 +3,12 @@
   <head>
     <title>{% block title %}Todo list{% endblock %}</title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+      .btn-sm {
+          width: 100%;  /* Faire en sorte que tous les boutons prennent toute la largeur de la cellule */
+          text-align: center;  /* Centrer le texte à l'intérieur du bouton */
+      }
+  </style>
   </head>
   <body>
     {% include "menu" %}
