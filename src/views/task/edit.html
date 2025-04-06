@@ -74,6 +74,24 @@
                     <input type="text" name="grouping" id="grouping" value="{{ task.grouping }}" class="form-control border border-dark bg-light text-dark">
                 </div>
             </div>
+            <div class="row mb-3 align-items-center">
+                <label for="creation_date" class="col-sm-2 col-form-label fw-bold">Créé le</label>
+                <div class="col-sm-10">
+                    <input type="date" name="creation_date" id="creation_date" class="form-control border border-dark bg-light text-dark" value="{{ task.creation_date }}">
+                </div>
+            </div>
+            <div class="row mb-3 align-items-center">
+                <label for="start_date" class="col-sm-2 col-form-label fw-bold">Commencé le</label>
+                <div class="col-sm-10">
+                    <input type="date" name="start_date" id="start_date" class="form-control border border-dark bg-light text-dark" value="{{ task.start_date }}">
+                </div>
+            </div>
+            <div class="row mb-3 align-items-center">
+                <label for="completion_date" class="col-sm-2 col-form-label fw-bold">Terminé le</label>
+                <div class="col-sm-10">
+                    <input type="date" name="completion_date" id="completion_date" class="form-control border border-dark bg-light text-dark" value="{{ task.completion_date }}">
+                </div>
+            </div>
             <button type="submit" class="btn btn-success">Enregistrer</button>
             <a href="/task" class="btn btn-secondary">Annuler</a>
         </form>

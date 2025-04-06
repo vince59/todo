@@ -8,6 +8,7 @@ use axum::{
 use minijinja::context;
 use serde::Deserialize;
 use std::sync::Arc;
+use chrono::NaiveDate;
 
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
@@ -18,6 +19,9 @@ pub struct Input {
     duration: Duration,
     status: Status,
     grouping: String,
+    creation_date: NaiveDate,
+    completion_date: Option<NaiveDate>,
+    start_date: Option<NaiveDate>,
 }
 
 #[derive(Deserialize)]
@@ -128,6 +132,9 @@ pub async fn update(
         duration: input.duration,
         status: input.status,
         grouping: input.grouping,
+        creation_date: input.creation_date,
+        completion_date: input.completion_date,
+        start_date: input.start_date,
         ..Task::default()
     };
 
