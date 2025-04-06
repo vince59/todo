@@ -54,6 +54,14 @@ macro_rules! enum_with_strings {
     };
 }
 
+pub fn parse_optional_date(s: &str) -> Result<Option<NaiveDate>, chrono::ParseError> {
+    if s.trim().is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(NaiveDate::parse_from_str(s, "%Y-%m-%d")?))
+    }
+}
+
 pub fn print_usage(){
     println!("Usage :");
     println!("todo [-p port]");

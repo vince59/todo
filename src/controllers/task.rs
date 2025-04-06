@@ -1,18 +1,52 @@
 use crate::AppState;
 use crate::models::task::{Duration, Importance, Priority, Status, Task};
+use crate::utils::parse_optional_date;
 use axum::extract::{Form, Path, Query, State};
 use axum::{
     http::StatusCode,
     response::{Html, Redirect},
 };
+use chrono::NaiveDate;
 use minijinja::context;
 use serde::Deserialize;
 use std::sync::Arc;
-use chrono::NaiveDate;
+
+pub trait ToTask {
+    fn to_task(&self) -> Task;
+}
+
+// Structure pour récupérer les données du formulaire html de création de tâche
 
 #[derive(Deserialize, Debug)]
 #[allow(dead_code)]
-pub struct Input {
+pub struct CreateTaskForm {
+    description: String,
+    priority: Priority,
+    importance: Importance,
+    duration: Duration,
+    status: Status,
+    grouping: String,
+}
+
+impl ToTask for CreateTaskForm {
+    fn to_task(&self) -> Task {
+        Task {
+            description: self.description.clone(),
+            priority: self.priority,
+            importance: self.importance,
+            duration: self.duration,
+            status: self.status,
+            grouping: self.grouping.clone(),
+            ..Task::default()
+        }
+    }
+}
+
+// Structure pour récupérer les données du formulaire html d'édition de tâche
+
+#[derive(Deserialize, Debug)]
+#[allow(dead_code)]
+pub struct EditTaskForm {
     description: String,
     priority: Priority,
     importance: Importance,
@@ -20,8 +54,25 @@ pub struct Input {
     status: Status,
     grouping: String,
     creation_date: NaiveDate,
-    completion_date: Option<NaiveDate>,
-    start_date: Option<NaiveDate>,
+    completion_date: String,
+    start_date: String,
+}
+
+impl ToTask for EditTaskForm {
+    fn to_task(&self) -> Task {
+        Task {
+            description: self.description.clone(),
+            priority: self.priority,
+            importance: self.importance,
+            duration: self.duration,
+            status: self.status,
+            grouping: self.grouping.clone(),
+            completion_date: parse_optional_date(&self.completion_date).unwrap(),
+            start_date: parse_optional_date(&self.start_date).unwrap(),
+            creation_date: self.creation_date,
+            ..Task::default()
+        }
+    }
 }
 
 #[derive(Deserialize)]
@@ -72,18 +123,13 @@ pub async fn create(State(state): State<Arc<AppState>>) -> Result<Html<String>, 
 
 // ajoute une nouvelle tâche en base
 
-pub async fn insert(State(state): State<Arc<AppState>>, Form(input): Form<Input>) -> Redirect {
+pub async fn insert(
+    State(state): State<Arc<AppState>>,
+    Form(input): Form<CreateTaskForm>,
+) -> Redirect {
     let conn = state.db.lock().unwrap();
 
-    let task = Task {
-        description: input.description,
-        priority: input.priority,
-        importance: input.importance,
-        duration: input.duration,
-        status: input.status,
-        ..Task::default()
-    };
-    let _ = task.insert(&conn).map_err(|err| {
+    let _ = input.to_task().insert(&conn).map_err(|err| {
         eprintln!("Erreur sql: {:?}", err);
         StatusCode::INTERNAL_SERVER_ERROR
     });
@@ -122,23 +168,10 @@ pub async fn edit(
 pub async fn update(
     Path(id): Path<u32>,
     State(state): State<Arc<AppState>>,
-    Form(input): Form<Input>,
+    Form(input): Form<EditTaskForm>,
 ) -> Redirect {
     let conn = state.db.lock().unwrap();
-    let task = Task {
-        description: input.description,
-        priority: input.priority,
-        importance: input.importance,
-        duration: input.duration,
-        status: input.status,
-        grouping: input.grouping,
-        creation_date: input.creation_date,
-        completion_date: input.completion_date,
-        start_date: input.start_date,
-        ..Task::default()
-    };
-
-    let _ = task.update(id, &conn).map_err(|err| {
+    let _ = input.to_task().update(id, &conn).map_err(|err| {
         eprintln!("Erreur sql: {:?}", err);
         StatusCode::INTERNAL_SERVER_ERROR
     });

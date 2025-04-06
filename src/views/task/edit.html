@@ -9,13 +9,13 @@
             <div class="row mb-3 align-items-center">
                 <label for="description" class="col-sm-2 col-form-label fw-bold">Description</label>
                 <div class="col-sm-10">
-                    <textarea type="text" name="description" id="description" rows="3" class="form-control border border-dark bg-light text-dark" required>{{ task.description }}</textarea>
+                    <textarea type="text" name="description" rows="3" class="form-control border border-dark bg-light text-dark" required>{{ task.description }}</textarea>
                 </div>
             </div>
             <div class="row mb-3 align-items-center">
                 <label for="priority" class="col-sm-2 col-form-label fw-bold">Priorité</label>
                 <div class="col-sm-10">
-                    <select name="priority" id="priority" class="form-control border border-dark bg-light text-dark" required>
+                    <select name="priority" class="form-control border border-dark bg-light text-dark" required>
                         {% for (priority,name) in all_priority %}
                             {% if task.priority==priority %}
                                 <option value="{{ priority }}" selected>{{ name }}</option>
@@ -29,7 +29,7 @@
             <div class="row mb-3 align-items-center">
                 <label for="importance" class="col-sm-2 col-form-label fw-bold">Importance</label>
                 <div class="col-sm-10">
-                    <select name="importance" id="importance" class="form-control border border-dark bg-light text-dark" required>
+                    <select name="importance" class="form-control border border-dark bg-light text-dark" required>
                         {% for (importance,name) in all_importance %}
                             {% if task.importance==importance %}
                                 <option value="{{ importance }}" selected>{{ name }}</option>
@@ -43,7 +43,7 @@
             <div class="row mb-3 align-items-center">
                 <label for="duration" class="col-sm-2 col-form-label fw-bold">Durée</label>
                 <div class="col-sm-10">
-                    <select name="duration" id="duration" class="form-control border border-dark bg-light text-dark" required>
+                    <select name="duration" class="form-control border border-dark bg-light text-dark" required>
                         {% for (duration,name) in all_duration %}
                             {% if task.duration==duration %}
                                 <option value="{{ duration }}" selected>{{ name }}</option>
@@ -57,7 +57,7 @@
             <div class="row mb-3 align-items-center">
                 <label for="status" class="col-sm-2 col-form-label fw-bold">Statut</label>
                 <div class="col-sm-10">
-                    <select name="status" id="status" class="form-control border border-dark bg-light text-dark" required>
+                    <select name="status" class="form-control border border-dark bg-light text-dark" required>
                         {% for (status,name) in all_status %}
                             {% if task.status==status %}
                                 <option value="{{ status }}" selected>{{ name }}</option>
@@ -71,25 +71,25 @@
             <div class="row mb-3 align-items-center">
                 <label for="grouping" class="col-sm-2 col-form-label fw-bold">Regroupement</label>
                 <div class="col-sm-10">
-                    <input type="text" name="grouping" id="grouping" value="{{ task.grouping }}" class="form-control border border-dark bg-light text-dark">
+                    <input type="text" name="grouping" value="{{ task.grouping }}" class="form-control border border-dark bg-light text-dark">
                 </div>
             </div>
             <div class="row mb-3 align-items-center">
                 <label for="creation_date" class="col-sm-2 col-form-label fw-bold">Créé le</label>
                 <div class="col-sm-10">
-                    <input type="date" name="creation_date" id="creation_date" class="form-control border border-dark bg-light text-dark" value="{{ task.creation_date }}">
+                    <input type="date" name="creation_date" required class="form-control border border-dark bg-light text-dark" value="{{ task.creation_date }}">
                 </div>
             </div>
             <div class="row mb-3 align-items-center">
                 <label for="start_date" class="col-sm-2 col-form-label fw-bold">Commencé le</label>
                 <div class="col-sm-10">
-                    <input type="date" name="start_date" id="start_date" class="form-control border border-dark bg-light text-dark" value="{{ task.start_date }}">
+                    <input type="date" name="start_date" class="form-control border border-dark bg-light text-dark" value="{{ task.start_date }}">
                 </div>
             </div>
             <div class="row mb-3 align-items-center">
                 <label for="completion_date" class="col-sm-2 col-form-label fw-bold">Terminé le</label>
                 <div class="col-sm-10">
-                    <input type="date" name="completion_date" id="completion_date" class="form-control border border-dark bg-light text-dark" value="{{ task.completion_date }}">
+                    <input type="date" name="completion_date" class="form-control border border-dark bg-light text-dark" value="{{ task.completion_date }}">
                 </div>
             </div>
             <button type="submit" class="btn btn-success">Enregistrer</button>

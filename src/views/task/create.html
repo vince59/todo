@@ -8,13 +8,13 @@
             <div class="row mb-3 align-items-center">
                 <label for="description" class="col-sm-2 col-form-label fw-bold">Description</label>
                 <div class="col-sm-10">
-                    <textarea type="text" name="description" id="description" rows="3" class="form-control border border-dark bg-light text-dark" required></textarea>
+                    <textarea type="text" name="description" rows="3" class="form-control border border-dark bg-light text-dark" required></textarea>
                 </div>
             </div>
             <div class="row mb-3 align-items-center">
                 <label for="priority" class="col-sm-2 col-form-label fw-bold">Priorité</label>
                 <div class="col-sm-10">
-                    <select name="priority" id="priority" class="form-control border border-dark bg-light text-dark" required>
+                    <select name="priority" class="form-control border border-dark bg-light text-dark" required>
                         {% for (priority,name) in all_priority %}
                             <option value="{{ priority }}">{{ name }}</option>
                         {% endfor %}
@@ -24,7 +24,7 @@
             <div class="row mb-3 align-items-center">
                 <label for="importance" class="col-sm-2 col-form-label fw-bold">Importance</label>
                 <div class="col-sm-10">
-                    <select name="importance" id="importance" class="form-control border border-dark bg-light text-dark" required>
+                    <select name="importance" class="form-control border border-dark bg-light text-dark" required>
                         {% for (importance,name) in all_importance %}
                             <option value="{{ importance }}">{{ name }}</option>
                         {% endfor %}
@@ -34,7 +34,7 @@
             <div class="row mb-3 align-items-center">
                 <label for="importance" class="col-sm-2 col-form-label fw-bold">Durée</label>
                 <div class="col-sm-10">
-                    <select name="duration" id="duration" class="form-control border border-dark bg-light text-dark" required>
+                    <select name="duration" class="form-control border border-dark bg-light text-dark" required>
                         {% for (duration,name) in all_duration %}
                             <option value="{{ duration }}">{{ name }}</option>
                         {% endfor %}
@@ -44,7 +44,7 @@
             <div class="row mb-3 align-items-center">
                 <label for="grouping" class="col-sm-2 col-form-label fw-bold">Regroupement</label>
                 <div class="col-sm-10">
-                    <input type="text" name="grouping" id="grouping" class="form-control border border-dark bg-light text-dark">
+                    <input type="text" name="grouping" class="form-control border border-dark bg-light text-dark">
                 </div>
             </div>
             <input type="hidden" name="status" value="ToDo">
