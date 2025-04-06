@@ -134,11 +134,12 @@ impl Task {
     }
 
     // insert les données dans la base
-    pub fn insert(&self, conn: &Connection) -> Result<usize>{
-        conn.execute("INSERT INTO tasks (description, priority, importance, duration, creation_date, completion_date, start_date, status, grouping) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9);",
+    pub fn insert(&mut self, conn: &Connection) -> Result<usize>{
+        self.update_scoring();
+        conn.execute("INSERT INTO tasks (description, priority, importance, duration, creation_date, completion_date, start_date, status, grouping, scoring) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10);",
         (&self.description, &self.priority, &self.importance, 
         &self.duration, &self.creation_date, &self.completion_date, 
-        &self.start_date, &self.status, &self.grouping),)
+        &self.start_date, &self.status, &self.grouping, &self.scoring),)
     }
 
     // lit un id 
@@ -175,12 +176,4 @@ impl Task {
         conn.execute("DELETE FROM tasks WHERE id=?1;",params![id],)
     }
 
-    pub fn update_status(id:u32, status:Status,conn: &Connection)-> Result<usize>{
-        let rqt = match status {
-            Status::Finished => "UPDATE tasks SET status = ?1, completion_date = ?2 WHERE id=?3;",
-            Status::InProgress => "UPDATE tasks SET status = ?1, start_date = ?2 WHERE id=?3;",
-            _ => "UPDATE tasks SET status = ?1 WHERE id=?3;"
-        };
-        conn.execute(rqt,params![status,Local::now().date_naive(),id],)
-    }
 }

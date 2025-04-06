@@ -4,6 +4,7 @@ use minijinja::{value::Value, Error};
 
 // Macro permettant de déclarer un enum automatiquement et d'implémenter les traits pour sql
 // et pour avoir un texte associé à l'enum
+
 #[macro_export]
 macro_rules! enum_with_strings {
     ($name:ident { $($variant:ident => $string:expr),* $(,)? }) => {

@@ -201,10 +201,42 @@ pub async fn update_status(
 ) -> Redirect {
     let conn = state.db.lock().unwrap();
 
-    let _ = Task::update_status(id, param.status, &conn).map_err(|err| {
+    let mut task = Task::get_by_id(id, &conn).map_err(|err| {
+        eprintln!("Erreur sql: {:?}", err);
+        StatusCode::INTERNAL_SERVER_ERROR
+    }).unwrap();
+
+    task.status=param.status;
+
+    let _ = task.update(id, &conn).map_err(|err| {
         eprintln!("Erreur sql: {:?}", err);
         StatusCode::INTERNAL_SERVER_ERROR
     });
 
+    Redirect::to("/task")
+}
+
+pub async fn test(State(state): State<Arc<AppState>>) -> Redirect {
+    let conn = state.db.lock().unwrap();
+    for (p,p_s) in Priority::all() {
+        for (s,s_s) in Status::all(){
+            for (i,s_i) in Importance::all(){
+                for (d,d_s) in Duration::all(){
+                    let mut task=Task{
+                        description:format!("{p_s}-{s_s}-{s_i}-{d_s}").to_string(),
+                        priority:p,
+                        status:s,
+                        duration:d,
+                        importance:i,
+                        ..Task::default()
+                    };
+                    let _ = task.insert(&conn).map_err(|err| {
+                        eprintln!("Erreur sql: {:?}", err);
+                        StatusCode::INTERNAL_SERVER_ERROR
+                    });
+                }
+            }
+        }
+    }
     Redirect::to("/task")
 }
