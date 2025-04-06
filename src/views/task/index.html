@@ -6,6 +6,7 @@
     <thead class="table-dark">
         <tr>
             <th>Statut</th>
+            <th></th>
             <th>Description</th>
             <th>Priorité</th>
             <th>Importance</th>
@@ -35,6 +36,7 @@
                     {% endif %}
                 {% endfor %}
             </td>
+            <td>{{ task.scoring }}</td>
             <td>{{ task.description }}</td>
             <td>
                 {% for (priority,name) in all_priority %}

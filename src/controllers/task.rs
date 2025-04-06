@@ -56,6 +56,7 @@ pub struct EditTaskForm {
     creation_date: NaiveDate,
     completion_date: String,
     start_date: String,
+    scoring: u8
 }
 
 impl ToTask for EditTaskForm {
@@ -70,6 +71,7 @@ impl ToTask for EditTaskForm {
             completion_date: parse_optional_date(&self.completion_date).unwrap(),
             start_date: parse_optional_date(&self.start_date).unwrap(),
             creation_date: self.creation_date,
+            scoring: self.scoring,
             ..Task::default()
         }
     }

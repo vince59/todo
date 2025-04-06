@@ -50,6 +50,7 @@ pub struct Task {
     pub start_date: Option<NaiveDate>,
     pub status: Status,
     pub grouping: String,
+    pub scoring: u8
 }
 
 impl Default for Task {
@@ -64,14 +65,55 @@ impl Default for Task {
             completion_date: None,
             start_date: None,
             status: Status::ToDo,
+            scoring:0,
             grouping:"".to_string()
         }
     }
 }
 
 impl Task {
+
+    pub fn update_scoring(&mut self){
+        self.scoring=0;
+
+        self.scoring += match self.priority {
+            Priority::ToBeDefined => 0,
+            Priority::NotUrgent => 1,
+            Priority::Normal => 2,
+            Priority::Urgent => 3,
+            Priority::VeryUrgent => 4,
+        };
+
+        self.scoring += match self.importance {
+            Importance::ToBeDefined =>0,
+            Importance::NotImportant => 1,
+            Importance::Normal => 2,
+            Importance::Important => 3,
+            Importance::VeryImportant => 4
+        };
+
+        self.scoring += match self.duration {
+            Duration::ToBeDefined => 0,
+            Duration::VeryLong => 1,
+            Duration::Long => 2,
+            Duration::Normal => 3,
+            Duration::Short => 4,
+            Duration::VeryShort => 5
+        };
+
+        self.scoring *= match self.status {
+            Status::Canceled =>0,
+            Status::Finished =>1,
+            Status::Blocked =>2,
+            Status::ToDo => 3,
+            Status::InProgress => 4
+        }
+
+    }
+
+    // Ramène la liste des tâches
     pub fn get_all(conn: &Connection) -> Result<Vec<Task>> {
-        let mut stmt = conn.prepare("SELECT id, description, priority, importance, duration, creation_date, completion_date, start_date, status, grouping FROM tasks")?;
+        let mut stmt = conn.prepare("SELECT id, description, priority, importance, duration, creation_date, completion_date, start_date, status, grouping, scoring FROM tasks ORDER BY scoring desc")?;
         
         let tasks: Vec<Task> = stmt.query_map(params![], |row| {
             Ok(Task {
@@ -85,6 +127,7 @@ impl Task {
                 start_date: row.get("start_date")?,
                 status: row.get("status")?,
                 grouping: row.get("grouping")?,
+                scoring: row.get("scoring")?,
             })
         })?.collect::<Result<Vec<_>, _>>()?;
         Ok(tasks)
@@ -101,7 +144,7 @@ impl Task {
     // lit un id 
     pub fn get_by_id(id:u32,conn: &Connection) -> Result<Task>{
         conn.query_row(
-            "SELECT id, description, priority, importance, duration, creation_date, completion_date, start_date, status, grouping FROM tasks WHERE id = ?1",
+            "SELECT id, description, priority, importance, duration, creation_date, completion_date, start_date, status, grouping, scoring FROM tasks WHERE id = ?1",
             params![id],
             |row| {Ok(Task {
                 id: row.get("id")?,
@@ -114,16 +157,18 @@ impl Task {
                 start_date: row.get("start_date")?,
                 status: row.get("status")?,
                 grouping: row.get("grouping")?,
+                scoring:  row.get("scoring")?,
             })},
         )
     }
 
     // met à jour les données dans la base
-    pub fn update(&self,id:u32, conn: &Connection) -> Result<usize>{
-        conn.execute("UPDATE tasks SET description = ?1, priority = ?2, importance = ?3, duration = ?4, creation_date = ?5, completion_date = ?6, start_date = ?7, status = ?8, grouping = ?9 WHERE id = ?10;",
+    pub fn update(&mut self,id:u32, conn: &Connection) -> Result<usize>{
+        self.update_scoring();
+        conn.execute("UPDATE tasks SET description = ?1, priority = ?2, importance = ?3, duration = ?4, creation_date = ?5, completion_date = ?6, start_date = ?7, status = ?8, grouping = ?9, scoring = ?10 WHERE id = ?11;",
         (&self.description, &self.priority, &self.importance, 
         &self.duration, &self.creation_date, &self.completion_date, 
-        &self.start_date, &self.status, &self.grouping, id),)
+        &self.start_date, &self.status, &self.grouping,&self.scoring, id),)
     }
 
     pub fn delete(id:u32, conn: &Connection)-> Result<usize>{
