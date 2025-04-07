@@ -53,6 +53,15 @@ pub struct Task {
     pub scoring: u8
 }
 
+#[derive(Deserialize)]
+pub enum Filter {
+    DailyWork, // Toutes les taches sauf finies et annulée
+    WorkCompleted, // Taches finies du jour
+    All, // Toutes les taches
+    Blocked, // Taches bloquées
+    Quick // Tache rapides à faire
+}
+
 impl Default for Task {
     fn default() -> Self {
         Self {
@@ -112,10 +121,17 @@ impl Task {
     }
 
     // Ramène la liste des tâches
-    pub fn get_all(conn: &Connection) -> Result<Vec<Task>> {
-        let mut stmt = conn.prepare("SELECT id, description, priority, importance, duration, creation_date, completion_date, start_date, status, grouping, scoring FROM tasks ORDER BY scoring desc")?;
-        
-        let tasks: Vec<Task> = stmt.query_map(params![], |row| {
+    pub fn get_with_filter(conn: &Connection, filter:Filter) -> Result<Vec<Task>> {
+        let sql_select="SELECT id, description, priority, importance, duration, creation_date, completion_date, start_date, status, grouping, scoring FROM tasks";
+        let (mut stmt,param_list) = match filter {
+            Filter::All => (conn.prepare(&format!("{sql_select} ORDER BY scoring desc")).unwrap(),params![]),
+            Filter::DailyWork => (conn.prepare(&format!("{sql_select} WHERE status != ?1 and status != ?2 ORDER BY scoring desc")).unwrap(),params![Status::Finished,Status::Canceled]),
+            Filter::WorkCompleted => (conn.prepare(&format!("{sql_select} WHERE status = ?1 and completion_date = ?2 ORDER BY scoring desc")).unwrap(),params![Status::Finished,Local::now().date_naive()]),
+            Filter::Blocked => (conn.prepare(&format!("{sql_select} WHERE status = ?1 ORDER BY scoring desc")).unwrap(),params![Status::Blocked]),
+            Filter::Quick => (conn.prepare(&format!("{sql_select} WHERE status = ?1 ORDER BY duration desc, scoring desc")).unwrap(),params![Status::ToDo]),
+        };
+                
+        let tasks: Vec<Task> = stmt.query_map(param_list, |row| {
             Ok(Task {
                 id: row.get("id")?,
                 description: row.get("description")?,

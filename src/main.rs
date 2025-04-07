@@ -41,7 +41,7 @@ async fn main() {
     }
 
     let conn = Arc::new(Mutex::new(
-        Connection::open("C:\\rust\\todo\\todo.db").expect("❌ Erreur de connexion"),
+        Connection::open(".\\todo.db").expect("❌ Erreur de connexion"),
     ));
 
     println!("Server starts on port : {port}");
@@ -55,6 +55,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(controllers::home::controller_home))
         .route("/task", get(controllers::task::index))
+        .route("/task/filter", get(controllers::task::filter))
         .route("/task/create", get(controllers::task::create).post(controllers::task::insert),)
         .route("/task/{id}/edit", get(controllers::task::edit).post(controllers::task::update),)
         .route("/task/{id}/delete", get(controllers::task::delete),)

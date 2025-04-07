@@ -1,5 +1,5 @@
 use crate::AppState;
-use crate::models::task::{Duration, Importance, Priority, Status, Task};
+use crate::models::task::{Duration, Importance, Priority, Status, Task, Filter};
 use crate::utils::parse_optional_date;
 use axum::extract::{Form, Path, Query, State};
 use axum::{
@@ -77,22 +77,29 @@ impl ToTask for EditTaskForm {
     }
 }
 
+// structure pour récupérer les paramètres url de changement de statut
+
 #[derive(Deserialize)]
 pub struct StatusParam {
     status: Status,
 }
 
-// retourne toutes les tâches
+// structure pour récupérer les paramètres url de filtre de liste
 
-pub async fn index(State(state): State<Arc<AppState>>) -> Result<Html<String>, StatusCode> {
+#[derive(Deserialize)]
+pub struct FilterParam {
+    filter: Filter,
+}
+
+fn do_filter(filter : Filter, state : Arc<AppState>)->Html<String>{
     let template = state.env.get_template("task.index").unwrap();
 
     let conn = state.db.lock().unwrap();
 
-    let tasks = Task::get_all(&conn).map_err(|err| {
+    let tasks = Task::get_with_filter(&conn,filter).map_err(|err| {
         eprintln!("Erreur sql: {:?}", err);
         StatusCode::INTERNAL_SERVER_ERROR
-    })?;
+    }).unwrap();
 
     let rendered = template
         .render(context! {
@@ -104,7 +111,17 @@ pub async fn index(State(state): State<Arc<AppState>>) -> Result<Html<String>, S
             all_status => Status::all(),
         })
         .unwrap();
-    Ok(Html(rendered))
+    Html(rendered)
+}
+
+pub async fn filter(Query(param): Query<FilterParam>,State(state): State<Arc<AppState>>) -> Result<Html<String>, StatusCode> {
+ Ok(do_filter(param.filter,state))
+}
+
+// retourne toutes les tâches
+
+pub async fn index(State(state): State<Arc<AppState>>) -> Result<Html<String>, StatusCode> {
+    Ok(do_filter(Filter::All,state))
 }
 
 // retourne le formulaire de création de tache
