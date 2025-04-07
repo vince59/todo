@@ -96,7 +96,7 @@ fn do_filter(filter : Filter, state : Arc<AppState>)->Html<String>{
 
     let conn = state.db.lock().unwrap();
 
-    let tasks = Task::get_with_filter(&conn,filter).map_err(|err| {
+    let tasks = Task::get_with_filter(&conn,&filter).map_err(|err| {
         eprintln!("Erreur sql: {:?}", err);
         StatusCode::INTERNAL_SERVER_ERROR
     }).unwrap();
@@ -104,6 +104,7 @@ fn do_filter(filter : Filter, state : Arc<AppState>)->Html<String>{
     let rendered = template
         .render(context! {
             title => "Todo liste",
+            filter => filter,
             tasks => tasks,
             all_priority => Priority::all(),
             all_importance => Importance::all(),

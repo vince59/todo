@@ -1,7 +1,7 @@
 {% extends "main" %}
 {% block title %}{{ super() }} | {{ title }} {% endblock %}
 {% block body %}
-<h3 class="text-center">Liste des tâches</h3>
+<h3 class="text-center">Liste des tâches ({{filter}}) </h3>
 <table class="table table-bordered">
     <thead class="table-dark">
         <tr>
@@ -27,11 +27,17 @@
                         {% elif task.status=='InProgress' %}
                             <a href="/task/{{ task.id }}/update_status?status=Finished" class="btn btn-warning btn-sm">{{ name }}</a>
                         {% elif task.status=='Finished' %}
-                            <a href="" class="btn btn-success btn-sm">{{ name }}</a>
+                            <form action="/task/{{ task.id }}/edit" method="GET" style="display:inline-block;">
+                                <button type="submit" class="btn btn-success btn-sm">{{ name }}</button>
+                            </form>
                         {% elif task.status=='Blocked' %}
-                            <a href="" class="btn btn-danger btn-sm">{{ name }}</a>
+                            <form action="/task/{{ task.id }}/edit" method="GET" style="display:inline-block;">
+                                <button type="submit" class="btn btn-danger btn-sm">{{ name }}</button>
+                            </form>
                         {% else %}
-                            <a href="" class="btn btn-light btn-sm">{{ name }}</a>
+                            <form action="/task/{{ task.id }}/edit" method="GET" style="display:inline-block;">
+                                <button type="submit" class="btn btn-light btn-sm">{{ name }}</button>
+                            </form>
                         {% endif %}
                     {% endif %}
                 {% endfor %}

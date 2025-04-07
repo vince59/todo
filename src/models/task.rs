@@ -53,7 +53,7 @@ pub struct Task {
     pub scoring: u8
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize,Serialize)]
 pub enum Filter {
     DailyWork, // Toutes les taches sauf finies et annulée
     WorkCompleted, // Taches finies du jour
@@ -121,7 +121,7 @@ impl Task {
     }
 
     // Ramène la liste des tâches
-    pub fn get_with_filter(conn: &Connection, filter:Filter) -> Result<Vec<Task>> {
+    pub fn get_with_filter(conn: &Connection, filter: &Filter) -> Result<Vec<Task>> {
         let sql_select="SELECT id, description, priority, importance, duration, creation_date, completion_date, start_date, status, grouping, scoring FROM tasks";
         let (mut stmt,param_list) = match filter {
             Filter::All => (conn.prepare(&format!("{sql_select} ORDER BY scoring desc")).unwrap(),params![]),
