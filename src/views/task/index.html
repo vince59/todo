@@ -18,7 +18,7 @@
     </thead>
     <tbody>
         {% for task in tasks %}
-        <tr class="table-primary">
+        <tr id="task{{task.id}}" class="table-primary">
             <td>
                 {% for (status,name) in all_status %}
                     {% if task.status==status %}

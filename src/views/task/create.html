@@ -12,6 +12,20 @@
                 </div>
             </div>
             <div class="row mb-3 align-items-center">
+                <label for="status" class="col-sm-2 col-form-label fw-bold">Statut</label>
+                <div class="col-sm-10">
+                    <select name="status" class="form-control border border-dark bg-light text-dark" required>
+                        {% for (status,name) in all_status %}
+                            {% if status=='ToDo' %}
+                                <option value="{{ status }}" selected>{{ name }}</option>
+                            {% else %}
+                                <option value="{{ status }}">{{ name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3 align-items-center">
                 <label for="priority" class="col-sm-2 col-form-label fw-bold">Priorité</label>
                 <div class="col-sm-10">
                     <select name="priority" class="form-control border border-dark bg-light text-dark" required>
@@ -47,7 +61,6 @@
                     <input type="text" name="grouping" class="form-control border border-dark bg-light text-dark">
                 </div>
             </div>
-            <input type="hidden" name="status" value="ToDo">
             <button type="submit" class="btn btn-success">Enregistrer</button>
             <a href="/task" class="btn btn-secondary">Annuler</a>
         </form>

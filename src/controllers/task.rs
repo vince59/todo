@@ -195,7 +195,7 @@ pub async fn update(
         eprintln!("Erreur sql: {:?}", err);
         StatusCode::INTERNAL_SERVER_ERROR
     });
-    Redirect::to("/task")
+    Redirect::to(&format!("/task#task{id}"))
 }
 
 // supprime un enregistrement en base et renvoie sur index

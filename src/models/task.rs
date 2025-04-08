@@ -59,7 +59,8 @@ pub enum Filter {
     WorkCompleted, // Taches finies du jour
     All, // Toutes les taches
     Blocked, // Taches bloquées
-    Quick // Tache rapides à faire
+    Quick, // Tached rapides à faire
+    UnClassified // Tached non classées
 }
 
 impl Default for Task {
@@ -129,6 +130,7 @@ impl Task {
             Filter::WorkCompleted => (conn.prepare(&format!("{sql_select} WHERE status = ?1 and completion_date = ?2 ORDER BY scoring desc")).unwrap(),params![Status::Finished,Local::now().date_naive()]),
             Filter::Blocked => (conn.prepare(&format!("{sql_select} WHERE status = ?1 ORDER BY scoring desc")).unwrap(),params![Status::Blocked]),
             Filter::Quick => (conn.prepare(&format!("{sql_select} WHERE status = ?1 ORDER BY duration desc, scoring desc")).unwrap(),params![Status::ToDo]),
+            Filter::UnClassified => (conn.prepare(&format!("{sql_select} WHERE status != ?1 and (priority = ?2 or importance = ?3 or duration = ?4) ORDER BY duration desc, scoring desc")).unwrap(),params![Status::Finished,Priority::ToBeDefined,Importance::ToBeDefined,Duration::ToBeDefined]),
         };
                 
         let tasks: Vec<Task> = stmt.query_map(param_list, |row| {
