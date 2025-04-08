@@ -91,7 +91,14 @@ pub struct FilterParam {
     filter: Filter,
 }
 
-fn do_filter(filter : Filter, state : Arc<AppState>)->Html<String>{
+// structure pour récupérer les paramètres url de focus de liste
+
+#[derive(Deserialize)]
+pub struct FocusParam {
+    id: u32,
+}
+
+fn do_filter(filter : Filter, id:Option<u32>,state : Arc<AppState>)->Html<String>{
     let template = state.env.get_template("task.index").unwrap();
 
     let conn = state.db.lock().unwrap();
@@ -110,19 +117,26 @@ fn do_filter(filter : Filter, state : Arc<AppState>)->Html<String>{
             all_importance => Importance::all(),
             all_duration => Duration::all(),
             all_status => Status::all(),
+            id => id
         })
         .unwrap();
     Html(rendered)
 }
 
 pub async fn filter(Query(param): Query<FilterParam>,State(state): State<Arc<AppState>>) -> Result<Html<String>, StatusCode> {
- Ok(do_filter(param.filter,state))
+ Ok(do_filter(param.filter,None,state))
 }
 
 // retourne toutes les tâches
 
 pub async fn index(State(state): State<Arc<AppState>>) -> Result<Html<String>, StatusCode> {
-    Ok(do_filter(Filter::All,state))
+    Ok(do_filter(Filter::All,None,state))
+}
+
+// retourne toutes les tâches avec un focus sur une tâche en particulier
+
+pub async fn focus(Query(param): Query<FocusParam>,State(state): State<Arc<AppState>>) -> Result<Html<String>, StatusCode> {
+    Ok(do_filter(Filter::All,Some(param.id),state))
 }
 
 // retourne le formulaire de création de tache
@@ -195,7 +209,7 @@ pub async fn update(
         eprintln!("Erreur sql: {:?}", err);
         StatusCode::INTERNAL_SERVER_ERROR
     });
-    Redirect::to(&format!("/task#task{id}"))
+    Redirect::to(&format!("/task/focus?id={id}#task{id}"))
 }
 
 // supprime un enregistrement en base et renvoie sur index

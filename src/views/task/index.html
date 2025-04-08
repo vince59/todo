@@ -18,25 +18,29 @@
     </thead>
     <tbody>
         {% for task in tasks %}
-        <tr id="task{{task.id}}" class="table-primary">
+        {% if task.id==id %}
+        <tr class="table-active">
+        {% else %}
+        <tr class="table-primary">
+        {% endif %}
             <td>
                 {% for (status,name) in all_status %}
                     {% if task.status==status %}
                         {% if task.status=='ToDo' %}
-                            <a href="/task/{{ task.id }}/update_status?status=InProgress" class="btn btn-secondary btn-sm">{{ name }}</a>
+                            <a id="task{{task.id}}" href="/task/{{ task.id }}/update_status?status=InProgress" class="btn btn-secondary btn-sm">{{ name }}</a>
                         {% elif task.status=='InProgress' %}
-                            <a href="/task/{{ task.id }}/update_status?status=Finished" class="btn btn-warning btn-sm">{{ name }}</a>
+                            <a id="task{{task.id}}" href="/task/{{ task.id }}/update_status?status=Finished" class="btn btn-warning btn-sm">{{ name }}</a>
                         {% elif task.status=='Finished' %}
                             <form action="/task/{{ task.id }}/edit" method="GET" style="display:inline-block;">
-                                <button type="submit" class="btn btn-success btn-sm">{{ name }}</button>
+                                <button id="task{{task.id}}" type="submit" class="btn btn-success btn-sm">{{ name }}</button>
                             </form>
                         {% elif task.status=='Blocked' %}
                             <form action="/task/{{ task.id }}/edit" method="GET" style="display:inline-block;">
-                                <button type="submit" class="btn btn-danger btn-sm">{{ name }}</button>
+                                <button id="task{{task.id}}" type="submit" class="btn btn-danger btn-sm">{{ name }}</button>
                             </form>
                         {% else %}
                             <form action="/task/{{ task.id }}/edit" method="GET" style="display:inline-block;">
-                                <button type="submit" class="btn btn-light btn-sm">{{ name }}</button>
+                                <button id="task{{task.id}}" type="submit" class="btn btn-light btn-sm">{{ name }}</button>
                             </form>
                         {% endif %}
                     {% endif %}
