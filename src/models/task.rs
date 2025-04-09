@@ -59,7 +59,8 @@ enum_with_strings!(Filter {
     All=> "Toutes les tâches", 
     Blocked => "Tâches bloquées", 
     Quick => "Taches rapide", 
-    UnClassified => "Tâches non classées" 
+    UnClassified => "Tâches non classées",
+    ByProject => "Tâches par projets" 
 });
 
 impl Default for Task {
@@ -137,6 +138,7 @@ impl Task {
             Filter::Blocked => (conn.prepare(&format!("{sql_select} WHERE status = ?1 ORDER BY scoring desc")).unwrap(),params![Status::Blocked]),
             Filter::Quick => (conn.prepare(&format!("{sql_select} WHERE status = ?1 ORDER BY duration desc, scoring desc")).unwrap(),params![Status::ToDo]),
             Filter::UnClassified => (conn.prepare(&format!("{sql_select} WHERE status != ?1 and (priority = ?2 or importance = ?3 or duration = ?4) ORDER BY duration desc, scoring desc")).unwrap(),params![Status::Finished,Priority::ToBeDefined,Importance::ToBeDefined,Duration::ToBeDefined]),
+            Filter::ByProject => (conn.prepare(&format!("{sql_select} WHERE status != ?1 ORDER BY grouping desc, scoring desc")).unwrap(),params![Status::Finished]),
         };
                 
         let tasks: Vec<Task> = stmt.query_map(param_list, |row| {

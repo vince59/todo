@@ -6,22 +6,23 @@
     <thead class="table-dark">
         <tr>
             <th>Statut</th>
+            <th>Projet</th>
             <th></th>
             <th>Description</th>
             <th>Priorité</th>
             <th>Importance</th>
             <th>Durée</th>
             <th>Créé le</th>
-            <th>Commencé le</th>
+            <th>Début</th>
             <th>Action</th>
         </tr>
     </thead>
     <tbody>
         {% for task in tasks %}
         {% if task.id==id %}
-        <tr class="table-active">
+        <tr class="table-active" onclick="window.location='/task/{{ task.id }}/edit'">
         {% else %}
-        <tr class="table-primary">
+        <tr class="table-primary" onclick="window.location='/task/{{ task.id }}/edit'">
         {% endif %}
             <td>
                 {% for (status,name) in all_status %}
@@ -46,6 +47,7 @@
                     {% endif %}
                 {% endfor %}
             </td>
+            <td>{{ task.grouping }}</td>
             <td>{{ task.scoring }}</td>
             <td>{{ task.description }}</td>
             <td>
@@ -73,9 +75,6 @@
             <td>{{ task.creation_date | format_date }}</td>
             <td>{{ task.start_date | format_date }}</td>
             <td>
-                <form action="/task/{{ task.id }}/edit" method="GET" style="display:inline-block;">
-                    <button type="submit" class="btn btn-warning btn-sm">Modifier</button>
-                </form>
                 <form action="/task/{{ task.id }}/delete" method="GET" style="display:inline-block;">
                     <button type="submit" class="btn btn-danger btn-sm"
                         onclick="return confirm('Etes vous sûr ?')">Supprimer</button>
