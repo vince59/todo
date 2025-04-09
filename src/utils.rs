@@ -40,6 +40,7 @@ macro_rules! enum_with_strings {
         // Ajoute une fonction qui retourne un vecteur avec pour chaque occurence de l'enum un tuple
         // comprenant l'occurence de l'enum et son texte (pour affichage dans les vues)
         impl $name {
+            #[allow(dead_code)]
             pub fn all() -> Vec<($name, String)> {
                 vec![
                     $(($name::$variant, $string.to_string())),*

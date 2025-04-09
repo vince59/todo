@@ -54,22 +54,13 @@ pub struct Task {
 }
 
 enum_with_strings!(Filter {
-    ToDo => "A faire",
-    InProgress => "En cours",
-    Finished => "Fini",
-    Canceled => "Annulé",
-    Blocked => "Bloqué",
+    DailyWork => "Taches en cours", 
+    WorkCompleted => "Tâches Réalisées du jour", 
+    All=> "Toutes les tâches", 
+    Blocked => "Tâches bloquées", 
+    Quick => "Taches rapide", 
+    UnClassified => "Tâches non classées" 
 });
-
-#[derive(Deserialize,Serialize)]
-pub enum Filter {
-    DailyWork, // Toutes les taches sauf finies et annulée
-    WorkCompleted, // Taches finies du jour
-    All, // Toutes les taches
-    Blocked, // Taches bloquées
-    Quick, // Tached rapides à faire
-    UnClassified // Tached non classées
-}
 
 impl Default for Task {
     fn default() -> Self {

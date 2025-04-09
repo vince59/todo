@@ -113,7 +113,8 @@ fn do_filter(filter: Filter, id: Option<u32>, state: Arc<AppState>) -> Html<Stri
     let rendered = template
         .render(context! {
             title => "Todo liste",
-            filter => filter,
+            filter => filter.to_string(),
+            nb => tasks.len(),
             tasks => tasks,
             all_priority => Priority::all(),
             all_importance => Importance::all(),
