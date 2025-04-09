@@ -53,6 +53,14 @@ pub struct Task {
     pub scoring: u8
 }
 
+enum_with_strings!(Filter {
+    ToDo => "A faire",
+    InProgress => "En cours",
+    Finished => "Fini",
+    Canceled => "Annulé",
+    Blocked => "Bloqué",
+});
+
 #[derive(Deserialize,Serialize)]
 pub enum Filter {
     DailyWork, // Toutes les taches sauf finies et annulée
@@ -82,6 +90,14 @@ impl Default for Task {
 }
 
 impl Task {
+
+    pub fn update_date(&mut self){
+       (self.completion_date,self.start_date) = match self.status {
+            Status::Finished => (Some(Local::now().date_naive()),if self.start_date==None {Some(Local::now().date_naive())} else {self.start_date}),
+            Status::InProgress => (None,Some(Local::now().date_naive())),
+            _ => (self.completion_date,self.start_date)
+        }
+    }
 
     pub fn update_scoring(&mut self){
         self.scoring=0;
@@ -117,8 +133,7 @@ impl Task {
             Status::Blocked =>2,
             Status::ToDo => 3,
             Status::InProgress => 4
-        }
-
+        };
     }
 
     // Ramène la liste des tâches
@@ -154,6 +169,7 @@ impl Task {
     // insert les données dans la base
     pub fn insert(&mut self, conn: &Connection) -> Result<usize>{
         self.update_scoring();
+        self.update_date();
         conn.execute("INSERT INTO tasks (description, priority, importance, duration, creation_date, completion_date, start_date, status, grouping, scoring) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10);",
         (&self.description, &self.priority, &self.importance, 
         &self.duration, &self.creation_date, &self.completion_date, 
@@ -184,6 +200,7 @@ impl Task {
     // met à jour les données dans la base
     pub fn update(&mut self,id:u32, conn: &Connection) -> Result<usize>{
         self.update_scoring();
+        self.update_date();
         conn.execute("UPDATE tasks SET description = ?1, priority = ?2, importance = ?3, duration = ?4, creation_date = ?5, completion_date = ?6, start_date = ?7, status = ?8, grouping = ?9, scoring = ?10 WHERE id = ?11;",
         (&self.description, &self.priority, &self.importance, 
         &self.duration, &self.creation_date, &self.completion_date, 

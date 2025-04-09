@@ -1,5 +1,5 @@
 use crate::AppState;
-use crate::models::task::{Duration, Importance, Priority, Status, Task, Filter};
+use crate::models::task::{Duration, Filter, Importance, Priority, Status, Task};
 use crate::utils::parse_optional_date;
 use axum::extract::{Form, Path, Query, State};
 use axum::{
@@ -56,7 +56,7 @@ pub struct EditTaskForm {
     creation_date: NaiveDate,
     completion_date: String,
     start_date: String,
-    scoring: u8
+    scoring: u8,
 }
 
 impl ToTask for EditTaskForm {
@@ -98,15 +98,17 @@ pub struct FocusParam {
     id: u32,
 }
 
-fn do_filter(filter : Filter, id:Option<u32>,state : Arc<AppState>)->Html<String>{
+fn do_filter(filter: Filter, id: Option<u32>, state: Arc<AppState>) -> Html<String> {
     let template = state.env.get_template("task.index").unwrap();
 
     let conn = state.db.lock().unwrap();
 
-    let tasks = Task::get_with_filter(&conn,&filter).map_err(|err| {
-        eprintln!("Erreur sql: {:?}", err);
-        StatusCode::INTERNAL_SERVER_ERROR
-    }).unwrap();
+    let tasks = Task::get_with_filter(&conn, &filter)
+        .map_err(|err| {
+            eprintln!("Erreur sql: {:?}", err);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })
+        .unwrap();
 
     let rendered = template
         .render(context! {
@@ -123,20 +125,26 @@ fn do_filter(filter : Filter, id:Option<u32>,state : Arc<AppState>)->Html<String
     Html(rendered)
 }
 
-pub async fn filter(Query(param): Query<FilterParam>,State(state): State<Arc<AppState>>) -> Result<Html<String>, StatusCode> {
- Ok(do_filter(param.filter,None,state))
+pub async fn filter(
+    Query(param): Query<FilterParam>,
+    State(state): State<Arc<AppState>>,
+) -> Result<Html<String>, StatusCode> {
+    Ok(do_filter(param.filter, None, state))
 }
 
 // retourne toutes les tâches
 
 pub async fn index(State(state): State<Arc<AppState>>) -> Result<Html<String>, StatusCode> {
-    Ok(do_filter(Filter::All,None,state))
+    Ok(do_filter(Filter::All, None, state))
 }
 
 // retourne toutes les tâches avec un focus sur une tâche en particulier
 
-pub async fn focus(Query(param): Query<FocusParam>,State(state): State<Arc<AppState>>) -> Result<Html<String>, StatusCode> {
-    Ok(do_filter(Filter::All,Some(param.id),state))
+pub async fn focus(
+    Query(param): Query<FocusParam>,
+    State(state): State<Arc<AppState>>,
+) -> Result<Html<String>, StatusCode> {
+    Ok(do_filter(Filter::All, Some(param.id), state))
 }
 
 // retourne le formulaire de création de tache
@@ -233,33 +241,35 @@ pub async fn update_status(
 ) -> Redirect {
     let conn = state.db.lock().unwrap();
 
-    let mut task = Task::get_by_id(id, &conn).map_err(|err| {
-        eprintln!("Erreur sql: {:?}", err);
-        StatusCode::INTERNAL_SERVER_ERROR
-    }).unwrap();
+    let mut task = Task::get_by_id(id, &conn)
+        .map_err(|err| {
+            eprintln!("Erreur sql: {:?}", err);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })
+        .unwrap();
 
-    task.status=param.status;
+    task.status = param.status;
 
     let _ = task.update(id, &conn).map_err(|err| {
         eprintln!("Erreur sql: {:?}", err);
         StatusCode::INTERNAL_SERVER_ERROR
     });
 
-    Redirect::to("/task")
+    Redirect::to(&format!("/task/focus?id={id}#task{id}"))
 }
 
 pub async fn test(State(state): State<Arc<AppState>>) -> Redirect {
     let conn = state.db.lock().unwrap();
-    for (p,p_s) in Priority::all() {
-        for (s,s_s) in Status::all(){
-            for (i,s_i) in Importance::all(){
-                for (d,d_s) in Duration::all(){
-                    let mut task=Task{
-                        description:format!("{p_s}-{s_s}-{s_i}-{d_s}").to_string(),
-                        priority:p,
-                        status:s,
-                        duration:d,
-                        importance:i,
+    for (p, p_s) in Priority::all() {
+        for (s, s_s) in Status::all() {
+            for (i, s_i) in Importance::all() {
+                for (d, d_s) in Duration::all() {
+                    let mut task = Task {
+                        description: format!("{p_s}-{s_s}-{s_i}-{d_s}").to_string(),
+                        priority: p,
+                        status: s,
+                        duration: d,
+                        importance: i,
                         ..Task::default()
                     };
                     let _ = task.insert(&conn).map_err(|err| {
