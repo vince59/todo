@@ -14,5 +14,29 @@
     {% include "menu" %}
     {% block body %}{% endblock %}
     <script src="/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const socket = new WebSocket("ws://localhost:3000/ws");
+      const textarea = document.getElementById("note");
+      let lastSentText = "";
+      let lastUserText = "";
+  
+      // Met à jour le texte quand l'utilisateur tape
+      textarea.addEventListener("input", () => {
+        lastUserText = textarea.value;
+      });
+  
+      // Envoie le texte modifié une fois par seconde
+      setInterval(() => {
+        if (socket.readyState === WebSocket.OPEN && lastUserText !== lastSentText) {
+          socket.send(lastUserText);
+          lastSentText = lastUserText;
+          console.log("Texte envoyé :", lastUserText);
+        }
+      }, 1000);
+  
+      socket.onmessage = (event) => {
+        console.log("Réponse du serveur :", event.data);
+      };
+    </script>
   </body>
 </html>

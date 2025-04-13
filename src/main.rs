@@ -5,8 +5,10 @@ mod views;
 
 use std::sync::{Arc, Mutex};
 use axum::{Router, http::header, response::IntoResponse, routing::get};
+use axum::extract::ws::{Message, WebSocket,WebSocketUpgrade};
 use minijinja::Environment;
 use rusqlite::Connection;
+use futures::stream::StreamExt;
 
 const BOOTSTRAP_CSS: &[u8] = include_bytes!("./static/css/bootstrap.min.css");
 const BOOTSTRAP_JS: &[u8] = include_bytes!("./static/js/bootstrap.bundle.min.js");
@@ -26,6 +28,25 @@ async fn serve_bootstrap_js() -> impl IntoResponse {
         [(header::CONTENT_TYPE, "application/javascript")],
         BOOTSTRAP_JS.to_vec(),
     )
+}
+
+// Endpoint qui upgrade en WebSocket
+async fn handle_ws(ws: WebSocketUpgrade) -> impl IntoResponse {
+    ws.on_upgrade(handle_socket)
+}
+
+// Gère la connexion WebSocket une fois établie
+async fn handle_socket(mut socket: WebSocket) {
+    while let Some(Ok(msg)) = socket.next().await {
+        match msg {
+            Message::Text(text) => {
+                println!("Reçu: {}", text);
+                let _ = socket.send(Message::Text(format!("Echo: {}", text).into())).await;
+            }
+            Message::Close(_) => break,
+            _ => {}
+        }
+    }
 }
 
 #[tokio::main]
@@ -64,6 +85,7 @@ async fn main() {
         .route("/test", get(controllers::task::test),)
         .route("/css/bootstrap.min.css", get(serve_bootstrap_css))
         .route("/js/bootstrap.bundle.min.js", get(serve_bootstrap_js))
+        .route("/ws", get(handle_ws))
         .with_state(app_state);
     let listener = tokio::net::TcpListener::bind(format!("127.0.0.1:{port}"))
         .await
